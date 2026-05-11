@@ -962,134 +962,6 @@
       line-height: 1.45;
     }
 
-
-
-    .bracket-prediction-summary {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-
-    .bracket-prediction-stat {
-      border-radius: 18px;
-      padding: 14px 16px;
-      background: linear-gradient(135deg, rgba(0,0,0,.92), rgba(39,39,42,.92));
-      border: 1px solid rgba(255,212,0,.32);
-      color: #fff;
-      box-shadow: 0 10px 22px rgba(0,0,0,.14);
-    }
-
-    .bracket-prediction-stat strong {
-      display: block;
-      color: var(--yellow);
-      font-size: 26px;
-      margin-bottom: 4px;
-    }
-
-    .bracket-prediction-view {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .bracket-prediction-stage {
-      border: 1px solid rgba(255,212,0,.25);
-      border-radius: 22px;
-      padding: 16px;
-      background: rgba(0,0,0,.04);
-    }
-
-    .bracket-prediction-stage h3 {
-      color: #18181b;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .bracket-prediction-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    @media (max-width: 1200px) {
-      .bracket-prediction-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    @media (max-width: 760px) {
-      .bracket-prediction-grid,
-      .bracket-prediction-summary { grid-template-columns: 1fr; }
-    }
-
-    .bracket-prediction-card {
-      border-radius: 18px;
-      border: 1px solid #e5e7eb;
-      background: #fff;
-      padding: 14px;
-      box-shadow: 0 10px 24px rgba(15,23,42,.06);
-    }
-
-    .bracket-prediction-card.locked {
-      background: #f9fafb;
-      opacity: .78;
-    }
-
-    .bracket-prediction-card .match-code {
-      font-size: 12px;
-      font-weight: 900;
-      color: #71717a;
-      margin-bottom: 10px;
-    }
-
-    .bracket-prediction-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 64px;
-      gap: 8px;
-      align-items: end;
-      margin-bottom: 10px;
-    }
-
-    .bracket-prediction-row label {
-      font-size: 12px;
-      margin-bottom: 4px;
-    }
-
-    .bracket-prediction-team-readonly {
-      min-height: 42px;
-      display: flex;
-      align-items: center;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 10px 12px;
-      background: #f9fafb;
-      font-weight: 800;
-      color: #18181b;
-    }
-
-    .bracket-prediction-team-readonly .mini-team {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      min-width: 0;
-    }
-
-    .winner-select-row {
-      margin-top: 10px;
-    }
-
-    .bracket-prediction-card .actions {
-      margin-top: 12px;
-    }
-
-    .bracket-prediction-points {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #52525b;
-    }
-
     /* Fase 1 v5 · bracket completo, copa al centro */
     .bracket-poster.v5 {
       background:
@@ -1614,8 +1486,6 @@
       }
     }
 
-
-
   </style>
 </head>
 <body>
@@ -1760,14 +1630,13 @@
         </div>
 
         <ul class="rules-list">
+          <li><strong>3 puntos</strong> por acertar el resultado del partido: ganador o empate.</li>
+          <li><strong>+1 punto</strong> adicional si aciertas exactamente el marcador.</li>
+          <li><strong>0 puntos</strong> si no aciertas nada.</li>
+          <li>Máximo posible por partido: <strong>4 puntos</strong>.</li>
           <li><strong>10 puntos</strong> si aciertas el campeón del torneo.</li>
           <li><strong>10 puntos</strong> si aciertas el ganador de la Bota de Oro.</li>
-          <li><strong>3 puntos</strong> por acertar el resultado del partido: ganador o empate.</li>
-          <li><strong>+1 punto</strong> adicional si aciertas la diferencia de goles.</li>
-          <li><strong>+2 puntos</strong> adicionales si aciertas exactamente el marcador.</li>
-          <li><strong>0 puntos</strong> si no aciertas nada.</li>
-          <li>Máximo posible por partido: <strong>6 puntos</strong>.</li>
-          <li>Las predicciones, bonus y bracket personal se bloquean automáticamente cuando empieza el Mundial/partido correspondiente.</li>
+          <li>Las predicciones y bonus se bloquean automáticamente cuando empieza el Mundial/partido correspondiente.</li>
           <li>La quiniela se juega durante <strong>todo el torneo</strong>: fase de grupos y fases eliminatorias.</li>
           <li>El <strong>mismo sistema de puntuación</strong> por partido se mantiene desde la fase de grupos hasta la final.</li>
         </ul>
@@ -1890,8 +1759,8 @@
   </main>
 
   <script>
-    const APP_VERSION = "bf-world-cup-2026-v7-bracket-predictions";
-    const STORAGE_KEY = "quiniela_mundial_2026_bf_v7_bracket";
+    const APP_VERSION = "bf-world-cup-2026-v6-auth";
+    const STORAGE_KEY = "quiniela_mundial_2026_bf_v6_auth";
     const ADMIN_PIN = "2026";
     const GROUPS = ["A","B","C","D","E","F","G","H","I","J","K","L"];
     const LIVE_RESULTS_ENDPOINT = ""; // Opcional: pega aquí una URL/API propia que devuelva resultados en JSON.
@@ -3955,7 +3824,6 @@
       data.matches ||= structuredClone(INITIAL_MATCHES);
       data.predictions ||= [];
       data.bonusPredictions ||= [];
-      data.bracketPredictions ||= [];
       data.awards ||= { championTeamId: null, goldenBootPlayer: "" };
       data.live ||= { lastSync: null, lastMessage: "Modo local" };
       data.matches.forEach((match) => { match.status ||= match.finished ? "finished" : "scheduled"; });
@@ -4134,12 +4002,6 @@
       const team = getTeam(teamId);
       if (!team) return `<span class="mini-team"><span>❔</span> ${fallbackLabel}</span>`;
       return `<span class="mini-team">${renderMiniFlagImg(team.id, team.flag, `Bandera de ${team.name}`)} ${team.name}</span>`;
-    }
-
-    function renderBracketFlagOnly(teamId, fallbackLabel = "Por definir") {
-      const team = getTeam(teamId);
-      if (!team) return `<span class="bp-flag-only-label slot-placeholder">${fallbackLabel}</span>`;
-      return `<span class="bp-flag-only-label">${renderMiniFlagImg(team.id, team.flag, `Bandera de ${team.name}`)}</span>`;
     }
 
     function getGroupMatches(group) {
@@ -4503,11 +4365,9 @@
       let points = 0;
       const exactScore = prediction.homeScore === match.homeScore && prediction.awayScore === match.awayScore;
       const sameOutcome = getOutcome(prediction.homeScore, prediction.awayScore) === getOutcome(match.homeScore, match.awayScore);
-      const sameGoalDifference = (prediction.homeScore - prediction.awayScore) === (match.homeScore - match.awayScore);
 
       if (sameOutcome) points += 3;
-      if (sameGoalDifference) points += 1;
-      if (exactScore) points += 2;
+      if (exactScore) points += 1;
 
       return points;
     }
@@ -4555,55 +4415,8 @@
       return getChampionBonusPoints(userId) + getGoldenBootBonusPoints(userId);
     }
 
-    function getBracketPrediction(userId, matchNo) {
-      return state.bracketPredictions.find((prediction) => prediction.userId === userId && prediction.matchNo === matchNo) || null;
-    }
-
-    function getUserBracketPredictions(userId) {
-      return state.bracketPredictions.filter((prediction) => prediction.userId === userId);
-    }
-
-    function isBracketPredictionLocked() {
-      return new Date() >= getTournamentStartDate();
-    }
-
-    function getAllTeamsOptions(selected = "") {
-      return `<option value="">Selecciona selección</option>` + Object.values(TEAMS)
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((team) => `<option value="${team.id}" ${selected === team.id ? "selected" : ""}>${team.name}</option>`)
-        .join("");
-    }
-
-    function getPredictedSourceTeamId(ref, userId) {
-      if (!ref) return "";
-      if (/^W\d+$/.test(ref)) {
-        const source = getBracketPrediction(userId, Number(ref.substring(1)));
-        return source?.winnerTeamId || "";
-      }
-      if (/^L\d+$/.test(ref)) {
-        const source = getBracketPrediction(userId, Number(ref.substring(1)));
-        return source?.loserTeamId || "";
-      }
-      return "";
-    }
-
-    function isAutoBracketSlot(ref) {
-      return /^W\d+$/.test(ref || "") || /^L\d+$/.test(ref || "");
-    }
-
-    function getBracketSlotTeamId(match, side, userId) {
-      const pred = getBracketPrediction(userId, match.matchNo);
-      const ref = side === "home" ? match.homeRef : match.awayRef;
-      if (isAutoBracketSlot(ref)) return getPredictedSourceTeamId(ref, userId);
-      return side === "home" ? (pred?.homeTeamId || "") : (pred?.awayTeamId || "");
-    }
-
-    function calculateBracketPredictionPoints(userId) {
-      return 0;
-    }
-
     function getUserTotalPoints(userId) {
-      return getUserMatchPoints(userId) + getUserBonusPoints(userId) + calculateBracketPredictionPoints(userId);
+      return getUserMatchPoints(userId) + getUserBonusPoints(userId);
     }
 
     function getLeaderboard() {
@@ -4614,7 +4427,6 @@
             ...user,
             matchPoints: getUserMatchPoints(user.id),
             bonusPoints: getUserBonusPoints(user.id),
-            bracketPoints: calculateBracketPredictionPoints(user.id),
             points: getUserTotalPoints(user.id),
             predictedChampionTeamId: bonus?.championTeamId || "",
             predictions: state.predictions.filter((prediction) => prediction.userId === user.id).length
@@ -4694,219 +4506,6 @@
         </div>
       `;
     }
-
-    function renderBracketPrediction() {
-      const container = document.getElementById("bracketPredictionView");
-      const summary = document.getElementById("bracketPredictionSummary");
-      if (!container || !summary || !currentUser) return;
-
-      const locked = isBracketPredictionLocked();
-      const userPredictions = getUserBracketPredictions(currentUser.id);
-      const predictedCount = userPredictions.filter((prediction) => prediction.winnerTeamId).length;
-      const points = calculateBracketPredictionPoints(currentUser.id);
-      const knockoutMatches = state.matches.filter((match) => match.type === "knockout");
-
-      summary.innerHTML = `
-        <div class="bracket-prediction-stat"><strong>${predictedCount}</strong><span>cruces con ganador elegido</span></div>
-        <div class="bracket-prediction-stat"><strong>${points}</strong><span>puntos extra conseguidos</span></div>
-        <div class="bracket-prediction-stat"><strong>${locked ? "Bloqueado" : "Abierto"}</strong><span>${locked ? "El Mundial ya empezó" : "Primero elige selecciones y después los ganadores"}</span></div>
-      `;
-
-      const stageHtml = (stage, side) => {
-        const all = knockoutMatches.filter((match) => match.stage === stage).sort((a, b) => a.matchNo - b.matchNo);
-        const half = Math.ceil(all.length / 2);
-        const matches = side === "left" ? all.slice(0, half) : all.slice(half);
-        const slots = stage === "Dieciseisavos" ? 8 : stage === "Octavos" ? 4 : stage === "Cuartos" ? 2 : stage === "Semifinales" ? 1 : 0;
-        const missing = Math.max(0, slots - matches.length);
-        const stageClass = normalizeText(stage).replace(/\s+/g, "-");
-
-        return `
-          <div class="poster-round-v5 ${side} ${stageClass}">
-            <h3>${stage}</h3>
-            ${matches.map((match) => renderBracketPredictionCard(match, locked)).join("")}
-            ${Array.from({ length: missing }).map(() => `<div class="poster-match-v5 hidden-ko">Por definir</div>`).join("")}
-          </div>
-        `;
-      };
-
-      const finalMatch = knockoutMatches.find((match) => match.stage === "Final");
-      const thirdPlaceMatch = knockoutMatches.find((match) => match.stage === "Tercer puesto");
-
-      container.innerHTML = `
-        <div class="bracket-poster v5 user-bracket-poster">
-          <div class="poster-board-v5">
-            <div class="bracket-side-v5 left">
-              ${stageHtml("Dieciseisavos", "left")}
-              ${stageHtml("Octavos", "left")}
-              ${stageHtml("Cuartos", "left")}
-              ${stageHtml("Semifinales", "left")}
-            </div>
-
-            <div class="poster-center-v5">
-              <div class="poster-hero">
-                <h2>MI BRACKET<br/>2026</h2>
-              </div>
-              <div class="center-final-card">
-                <h3>Final</h3>
-                ${finalMatch ? renderBracketPredictionCard(finalMatch, locked) : `<div class="poster-match-v5 hidden-ko">Final por definir</div>`}
-              </div>
-              <div class="third-place-mini">
-                <h4>Tercer puesto</h4>
-                ${thirdPlaceMatch ? renderBracketPredictionCard(thirdPlaceMatch, locked) : `<div class="poster-match-v5 hidden-ko">Tercer puesto por definir</div>`}
-              </div>
-              <div class="poster-bottom-trophy">
-                <div class="poster-trophy-wrap">${renderWorldCupTrophySvg()}</div>
-              </div>
-            </div>
-
-            <div class="bracket-side-v5 right">
-              ${stageHtml("Semifinales", "right")}
-              ${stageHtml("Cuartos", "right")}
-              ${stageHtml("Octavos", "right")}
-              ${stageHtml("Dieciseisavos", "right")}
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderBracketPredictionCard(match, locked) {
-      const pred = getBracketPrediction(currentUser.id, match.matchNo);
-      const homeRef = match.homeRef || "";
-      const awayRef = match.awayRef || "";
-      const homeAuto = isAutoBracketSlot(homeRef);
-      const awayAuto = isAutoBracketSlot(awayRef);
-      const homeTeamId = getBracketSlotTeamId(match, "home", currentUser.id);
-      const awayTeamId = getBracketSlotTeamId(match, "away", currentUser.id);
-      const winnerOptions = [
-        `<option value="">Ganador</option>`,
-        homeTeamId ? `<option value="${homeTeamId}" ${pred?.winnerTeamId === homeTeamId ? "selected" : ""}>${teamName(homeTeamId)}</option>` : "",
-        awayTeamId ? `<option value="${awayTeamId}" ${pred?.winnerTeamId === awayTeamId ? "selected" : ""}>${teamName(awayTeamId)}</option>` : ""
-      ].join("");
-
-      const matchPoints = match.finished && match.winnerTeamId && pred?.winnerTeamId === match.winnerTeamId ? 1 : 0;
-      const canSave = !locked;
-
-      const teamControl = (side, auto, teamId) => {
-        if (auto) {
-          return teamId
-            ? `<div class="bp-team-readonly">${renderBracketFlagOnly(teamId)}</div>`
-            : `<div class="bp-slot-empty">Pendiente</div>`;
-        }
-        return `
-          <select id="bp-${match.matchNo}-${side}" class="bp-team-select" ${locked ? "disabled" : ""}>
-            ${getAllTeamsOptions(teamId)}
-          </select>
-        `;
-      };
-
-      return `
-        <article class="poster-match-v5 bp-bracket-card ${locked ? "locked" : ""}">
-          <div class="bp-match-code">P${match.matchNo}</div>
-
-          <div class="poster-team-v5">
-            <span class="bp-team-cell">${teamControl("home", homeAuto, homeTeamId)}</span>
-            <input id="bp-${match.matchNo}-homeScore" class="bp-score-input" type="number" min="0" value="${pred?.homeScore ?? ""}" ${locked ? "disabled" : ""} />
-          </div>
-
-          <div class="poster-team-v5">
-            <span class="bp-team-cell">${teamControl("away", awayAuto, awayTeamId)}</span>
-            <input id="bp-${match.matchNo}-awayScore" class="bp-score-input" type="number" min="0" value="${pred?.awayScore ?? ""}" ${locked ? "disabled" : ""} />
-          </div>
-
-          <div class="bp-winner-block">
-            <select id="bp-${match.matchNo}-winner" class="bp-winner-select" ${locked || (!homeTeamId && !awayTeamId) ? "disabled" : ""}>
-              ${winnerOptions}
-            </select>
-            <button class="btn-primary bp-save-button" onclick="saveBracketPrediction(${match.matchNo})" ${canSave ? "" : 'disabled style="opacity:.55;cursor:not-allowed;"'}>Guardar</button>
-          </div>
-
-          <small class="bp-points">${match.finished ? `Puntos: ${matchPoints}` : (homeAuto || awayAuto ? "Se completa según tus ganadores" : "Elige selecciones y guarda")}</small>
-        </article>
-      `;
-    }
-
-    function saveBracketPrediction(matchNo) {
-      if (isBracketPredictionLocked()) {
-        alert("El bracket personal ya está bloqueado porque el Mundial ha empezado.");
-        return;
-      }
-
-      const match = state.matches.find((item) => item.matchNo === matchNo && item.type === "knockout");
-      if (!match) return;
-
-      const homeRef = match.homeRef || "";
-      const awayRef = match.awayRef || "";
-      const homeAuto = isAutoBracketSlot(homeRef);
-      const awayAuto = isAutoBracketSlot(awayRef);
-
-      const homeTeamId = homeAuto
-        ? getPredictedSourceTeamId(homeRef, currentUser.id)
-        : document.getElementById(`bp-${matchNo}-home`)?.value || "";
-
-      const awayTeamId = awayAuto
-        ? getPredictedSourceTeamId(awayRef, currentUser.id)
-        : document.getElementById(`bp-${matchNo}-away`)?.value || "";
-
-      const homeScoreInput = document.getElementById(`bp-${matchNo}-homeScore`)?.value;
-      const awayScoreInput = document.getElementById(`bp-${matchNo}-awayScore`)?.value;
-      const homeScore = homeScoreInput === "" ? null : Number(homeScoreInput);
-      const awayScore = awayScoreInput === "" ? null : Number(awayScoreInput);
-
-      if ((homeScore !== null && (!Number.isInteger(homeScore) || homeScore < 0)) ||
-          (awayScore !== null && (!Number.isInteger(awayScore) || awayScore < 0))) {
-        alert("Introduce resultados válidos.");
-        return;
-      }
-
-      let winnerTeamId = document.getElementById(`bp-${matchNo}-winner`)?.value || "";
-
-      if (!winnerTeamId && homeTeamId && awayTeamId && homeScore !== null && awayScore !== null && homeScore !== awayScore) {
-        winnerTeamId = homeScore > awayScore ? homeTeamId : awayTeamId;
-      }
-
-      if (winnerTeamId && winnerTeamId !== homeTeamId && winnerTeamId !== awayTeamId) {
-        alert("La selección que pasa debe ser uno de los dos equipos del cruce.");
-        return;
-      }
-
-      const loserTeamId = winnerTeamId
-        ? (winnerTeamId === homeTeamId ? awayTeamId : homeTeamId)
-        : "";
-
-      let pred = getBracketPrediction(currentUser.id, matchNo);
-      if (!pred) {
-        pred = {
-          id: crypto.randomUUID(),
-          userId: currentUser.id,
-          matchNo,
-          homeTeamId,
-          awayTeamId,
-          homeScore,
-          awayScore,
-          winnerTeamId,
-          loserTeamId,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-        state.bracketPredictions.push(pred);
-      } else {
-        Object.assign(pred, {
-          homeTeamId,
-          awayTeamId,
-          homeScore,
-          awayScore,
-          winnerTeamId,
-          loserTeamId,
-          updatedAt: new Date().toISOString()
-        });
-      }
-
-      saveState();
-      renderLeaderboard();
-      refreshStats();
-    }
-
 
     function renderGroups() {
       const container = document.getElementById("groupsTables");
