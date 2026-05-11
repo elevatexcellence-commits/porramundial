@@ -1757,6 +1757,7 @@
 
 
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <header>
@@ -1830,7 +1831,7 @@
       </div>
 
       <p class="muted" style="margin-top: 14px;">
-        Fase 1 local: el registro se guarda en este navegador. En producción se conectará con base de datos y autenticación segura.
+Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de datos compartida.
       </p>
     </section>
 
@@ -2030,9 +2031,16 @@
   </main>
 
   <script>
-    const APP_VERSION = "bf-world-cup-2026-v7-bracket-predictions";
-    const STORAGE_KEY = "quiniela_mundial_2026_bf_v7_bracket";
+    const APP_VERSION = "bf-world-cup-2026-v29-supabase";
+    const STORAGE_KEY = "quiniela_mundial_2026_bf_v29_supabase_cache";
     const ADMIN_PIN = "2026";
+
+    // Supabase connection
+    // Public/publishable key only. Never use a secret/service_role key in this HTML.
+    const SUPABASE_URL = "https://oxjiebmdvylvyuclidr.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_hH-VtfJE9z0ztsEGZlZu5g_yzYpqZoQ";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+    let syncTimer = null;
     const GROUPS = ["A","B","C","D","E","F","G","H","I","J","K","L"];
     const LIVE_RESULTS_ENDPOINT = ""; // Opcional: pega aquí una URL/API propia que devuelva resultados en JSON.
     const LIVE_SYNC_INTERVAL_MS = 60000;
@@ -4074,36 +4082,245 @@
     function loadState() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.version === APP_VERSION) return ensureStateShape(parsed);
+        try {
+          return ensureStateShape(JSON.parse(saved));
+        } catch (error) {
+          console.warn("No se pudo leer caché local", error);
+        }
       }
-      const newState = ensureStateShape({
+
+      return ensureStateShape({
         version: APP_VERSION,
         users: [],
         matches: structuredClone(INITIAL_MATCHES),
         predictions: [],
         bonusPredictions: [],
         awards: { championTeamId: null, goldenBootPlayer: "" },
-        live: { lastSync: null, lastMessage: "Modo local" }
+        live: { lastSync: null, lastMessage: "Supabase pendiente de sincronizar" }
       });
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
-      return newState;
     }
 
     function ensureStateShape(data) {
+      data.version ||= APP_VERSION;
       data.users ||= [];
       data.matches ||= structuredClone(INITIAL_MATCHES);
       data.predictions ||= [];
       data.bonusPredictions ||= [];
-      data.bracketPredictions ||= [];
       data.awards ||= { championTeamId: null, goldenBootPlayer: "" };
-      data.live ||= { lastSync: null, lastMessage: "Modo local" };
+      data.live ||= { lastSync: null, lastMessage: "Supabase" };
       data.matches.forEach((match) => { match.status ||= match.finished ? "finished" : "scheduled"; });
       return data;
     }
 
     function saveState() {
+      saveStateLocalOnly();
+      queueSupabaseSync();
+    }
+
+    function saveStateLocalOnly() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function dbMatchToState(row) {
+      return {
+        id: row.id,
+        matchNo: row.match_no,
+        type: row.type,
+        stage: row.stage,
+        group: row.group_code,
+        homeTeamId: row.home_team_id,
+        awayTeamId: row.away_team_id,
+        homeRef: row.home_ref,
+        awayRef: row.away_ref,
+        matchDate: row.match_date,
+        venue: row.venue || "",
+        status: row.status || (row.finished ? "finished" : "scheduled"),
+        homeScore: row.home_score,
+        awayScore: row.away_score,
+        winnerTeamId: row.winner_team_id,
+        loserTeamId: row.loser_team_id,
+        finished: Boolean(row.finished)
+      };
+    }
+
+    function stateMatchToDb(match) {
+      return {
+        id: match.id,
+        match_no: match.matchNo,
+        type: match.type,
+        stage: match.stage,
+        group_code: match.group || null,
+        home_team_id: match.homeTeamId || null,
+        away_team_id: match.awayTeamId || null,
+        home_ref: match.homeRef || null,
+        away_ref: match.awayRef || null,
+        match_date: match.matchDate,
+        venue: match.venue || null,
+        status: match.status || (match.finished ? "finished" : "scheduled"),
+        home_score: match.homeScore,
+        away_score: match.awayScore,
+        winner_team_id: match.winnerTeamId || null,
+        loser_team_id: match.loserTeamId || null,
+        finished: Boolean(match.finished),
+        updated_at: new Date().toISOString()
+      };
+    }
+
+    function dbPredictionToState(row) {
+      return {
+        id: row.id,
+        userId: row.user_id,
+        matchId: row.match_id,
+        homeScore: row.predicted_home_score,
+        awayScore: row.predicted_away_score,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      };
+    }
+
+    function statePredictionToDb(prediction) {
+      return {
+        id: prediction.id,
+        user_id: prediction.userId,
+        match_id: prediction.matchId,
+        predicted_home_score: prediction.homeScore,
+        predicted_away_score: prediction.awayScore,
+        updated_at: new Date().toISOString()
+      };
+    }
+
+    function dbBonusToState(row) {
+      return {
+        id: row.id,
+        userId: row.user_id,
+        championTeamId: row.champion_team_id,
+        goldenBootPlayer: row.golden_boot_player || "",
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      };
+    }
+
+    function stateBonusToDb(bonus) {
+      return {
+        id: bonus.id,
+        user_id: bonus.userId,
+        champion_team_id: bonus.championTeamId || null,
+        golden_boot_player: bonus.goldenBootPlayer || null,
+        updated_at: new Date().toISOString()
+      };
+    }
+
+    async function loadStateFromSupabase() {
+      try {
+        const [profilesResult, matchesResult, predictionsResult, bonusResult, awardsResult] = await Promise.all([
+          supabaseClient.from("profiles").select("id,name,email,role,created_at,updated_at").order("name", { ascending: true }),
+          supabaseClient.from("matches").select("*").order("match_no", { ascending: true }),
+          supabaseClient.from("predictions").select("*"),
+          supabaseClient.from("bonus_predictions").select("*"),
+          supabaseClient.from("awards").select("*").eq("id", "world_cup_2026").maybeSingle()
+        ]);
+
+        const errors = [profilesResult.error, matchesResult.error, predictionsResult.error, bonusResult.error, awardsResult.error].filter(Boolean);
+        if (errors.length) throw errors[0];
+
+        const remoteMatches = matchesResult.data?.length ? matchesResult.data.map(dbMatchToState) : structuredClone(INITIAL_MATCHES);
+
+        state = ensureStateShape({
+          version: APP_VERSION,
+          users: (profilesResult.data || []).map((profile) => ({
+            id: profile.id,
+            name: profile.name,
+            email: profile.email,
+            role: profile.role || "user",
+            createdAt: profile.created_at,
+            updatedAt: profile.updated_at
+          })),
+          matches: remoteMatches,
+          predictions: (predictionsResult.data || []).map(dbPredictionToState),
+          bonusPredictions: (bonusResult.data || []).map(dbBonusToState),
+          awards: {
+            championTeamId: awardsResult.data?.champion_team_id || null,
+            goldenBootPlayer: awardsResult.data?.golden_boot_player || ""
+          },
+          live: { lastSync: new Date().toISOString(), lastMessage: "Conectado a Supabase" }
+        });
+
+        saveStateLocalOnly();
+        return state;
+      } catch (error) {
+        console.error("Error cargando Supabase", error);
+        state.live = { lastSync: new Date().toISOString(), lastMessage: `Error Supabase: ${error.message || error}` };
+        saveStateLocalOnly();
+        return state;
+      }
+    }
+
+    function queueSupabaseSync() {
+      if (!currentUser) return;
+      clearTimeout(syncTimer);
+      syncTimer = setTimeout(() => syncStateToSupabase(), 350);
+    }
+
+    async function syncStateToSupabase() {
+      if (!currentUser) return;
+
+      try {
+        await supabaseClient.from("profiles").update({
+          name: currentUser.name,
+          email: currentUser.email,
+          updated_at: new Date().toISOString()
+        }).eq("id", currentUser.id);
+
+        const userPredictions = state.predictions
+          .filter((prediction) => prediction.userId === currentUser.id)
+          .filter((prediction) => {
+            const match = state.matches.find((item) => item.id === prediction.matchId);
+            return match && !isMatchLocked(match);
+          })
+          .map(statePredictionToDb);
+
+        if (userPredictions.length) {
+          const { error } = await supabaseClient
+            .from("predictions")
+            .upsert(userPredictions, { onConflict: "user_id,match_id" });
+          if (error) throw error;
+        }
+
+        const bonus = state.bonusPredictions.find((item) => item.userId === currentUser.id);
+        if (bonus && !isBonusLocked()) {
+          const { error } = await supabaseClient
+            .from("bonus_predictions")
+            .upsert(stateBonusToDb(bonus), { onConflict: "user_id" });
+          if (error) throw error;
+        }
+
+        if (currentUser.role === "admin" || adminUnlocked) {
+          const matchRows = state.matches.map(stateMatchToDb);
+          if (matchRows.length) {
+            const { error } = await supabaseClient
+              .from("matches")
+              .upsert(matchRows, { onConflict: "id" });
+            if (error) console.warn("No se pudieron sincronizar partidos. Revisa que tu usuario sea admin en profiles.", error);
+          }
+
+          const { error: awardsError } = await supabaseClient
+            .from("awards")
+            .upsert({
+              id: "world_cup_2026",
+              champion_team_id: state.awards?.championTeamId || null,
+              golden_boot_player: state.awards?.goldenBootPlayer || null,
+              updated_at: new Date().toISOString()
+            }, { onConflict: "id" });
+          if (awardsError) console.warn("No se pudieron sincronizar awards", awardsError);
+        }
+
+        state.live = { lastSync: new Date().toISOString(), lastMessage: "Sincronizado con Supabase" };
+        saveStateLocalOnly();
+      } catch (error) {
+        console.error("Error sincronizando Supabase", error);
+        state.live = { lastSync: new Date().toISOString(), lastMessage: `Error Supabase: ${error.message || error}` };
+        saveStateLocalOnly();
+      }
     }
 
     function showAuthMessage(message, type = "") {
@@ -4117,10 +4334,10 @@
     }
 
     function getSafeUser(user) {
-      return { id: user.id, name: user.name, email: user.email, createdAt: user.createdAt };
+      return { id: user.id, name: user.name, email: user.email, role: user.role || "user", createdAt: user.createdAt };
     }
 
-    function registerUser() {
+    async function registerUser() {
       const name = document.getElementById("registerName").value.trim();
       const email = document.getElementById("registerEmail").value.trim().toLowerCase();
       const password = document.getElementById("registerPassword").value;
@@ -4146,26 +4363,34 @@
         return;
       }
 
-      const existingUser = state.users.find((u) => u.email === email);
-      if (existingUser && existingUser.password) {
-        showAuthMessage("Este correo ya está registrado. Entra con tu correo y contraseña.", "error");
+      showAuthMessage("Creando usuario en Supabase...", "");
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: { data: { name } }
+      });
+
+      if (error) {
+        showAuthMessage(`Error de registro: ${error.message}`, "error");
         return;
       }
 
-      const user = existingUser || { id: crypto.randomUUID(), createdAt: new Date().toISOString() };
-      user.name = name;
-      user.email = email;
-      user.password = password;
+      if (!data.session) {
+        showAuthMessage("Usuario creado. Revisa tu email para confirmar la cuenta y después inicia sesión.", "success");
+        return;
+      }
 
-      if (!existingUser) state.users.push(user);
-      saveState();
+      await supabaseClient.from("profiles").update({ name, email }).eq("id", data.user.id);
+      await loadStateFromSupabase();
 
-      currentUser = getSafeUser(user);
+      const profile = state.users.find((user) => user.id === data.user.id) || { id: data.user.id, name, email, role: "user" };
+      currentUser = getSafeUser(profile);
       sessionStorage.setItem("quiniela_current_user_bf_v6_auth", JSON.stringify(currentUser));
       openApp();
     }
 
-    function loginWithPassword() {
+    async function loginWithPassword() {
       const email = document.getElementById("loginEmail").value.trim().toLowerCase();
       const password = document.getElementById("loginPassword").value;
 
@@ -4179,18 +4404,24 @@
         return;
       }
 
-      const user = state.users.find((u) => u.email === email);
-      if (!user || !user.password) {
-        showAuthMessage("No existe una cuenta registrada con este correo. Regístrate primero.", "error");
+      showAuthMessage("Conectando con Supabase...", "");
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+      if (error || !data.user) {
+        showAuthMessage(`No se pudo iniciar sesión: ${error?.message || "usuario no encontrado"}`, "error");
         return;
       }
 
-      if (user.password !== password) {
-        showAuthMessage("Contraseña incorrecta.", "error");
-        return;
-      }
+      await loadStateFromSupabase();
+      const profile = state.users.find((user) => user.id === data.user.id) || {
+        id: data.user.id,
+        name: data.user.user_metadata?.name || email.split("@")[0],
+        email,
+        role: "user"
+      };
 
-      currentUser = getSafeUser(user);
+      currentUser = getSafeUser(profile);
       sessionStorage.setItem("quiniela_current_user_bf_v6_auth", JSON.stringify(currentUser));
       openApp();
     }
@@ -4199,7 +4430,8 @@
       loginWithPassword();
     }
 
-    function logout() {
+    async function logout() {
+      await supabaseClient.auth.signOut();
       currentUser = null;
       sessionStorage.removeItem("quiniela_current_user_bf_v6_auth");
       document.getElementById("loginSection").classList.remove("hidden");
@@ -4209,7 +4441,7 @@
     function openApp() {
       document.getElementById("loginSection").classList.add("hidden");
       document.getElementById("appSection").classList.remove("hidden");
-      document.getElementById("welcomeTitle").textContent = `Bienvenido, ${currentUser.name}`;
+      document.getElementById("welcomeTitle").textContent = `Bienvenido, ${currentUser.name}${currentUser.role === "admin" ? " · Admin" : ""}`;
       refreshAll();
     }
 
@@ -5718,22 +5950,28 @@
     }
 
 
-    window.addEventListener("load", () => {
+    window.addEventListener("load", async () => {
       startKickoffCountdown();
-      const savedUser = sessionStorage.getItem("quiniela_current_user_bf_v6_auth");
-      if (savedUser) {
-        const parsedUser = JSON.parse(savedUser);
-        const exists = state.users.some((user) => user.id === parsedUser.id && user.email === parsedUser.email);
-        if (exists) {
-          currentUser = parsedUser;
-          openApp();
-        } else {
-          sessionStorage.removeItem("quiniela_current_user_bf_v6_auth");
-          refreshLiveStatus();
-        }
-      } else {
-        refreshLiveStatus();
+
+      const { data } = await supabaseClient.auth.getSession();
+      const session = data?.session;
+
+      if (session?.user) {
+        await loadStateFromSupabase();
+        const profile = state.users.find((user) => user.id === session.user.id) || {
+          id: session.user.id,
+          name: session.user.user_metadata?.name || session.user.email.split("@")[0],
+          email: session.user.email,
+          role: "user"
+        };
+        currentUser = getSafeUser(profile);
+        sessionStorage.setItem("quiniela_current_user_bf_v6_auth", JSON.stringify(currentUser));
+        openApp();
+        return;
       }
+
+      await loadStateFromSupabase();
+      refreshLiveStatus();
     });
   </script>
 </body>
