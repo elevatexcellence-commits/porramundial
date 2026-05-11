@@ -2031,14 +2031,14 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
   </main>
 
   <script>
-    const APP_VERSION = "bf-world-cup-2026-v29-supabase";
-    const STORAGE_KEY = "quiniela_mundial_2026_bf_v29_supabase_cache";
+    const APP_VERSION = "bf-world-cup-2026-v30-supabase-fixed";
+    const STORAGE_KEY = "quiniela_mundial_2026_bf_v30_supabase_cache";
     const ADMIN_PIN = "2026";
 
     // Supabase connection
     // Public/publishable key only. Never use a secret/service_role key in this HTML.
-    const SUPABASE_URL = "https://oxjiebmdvylvyuclidr.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_hH-VtfJE9z0ztsEGZlZu5g_yzYpqZoQ";
+    const SUPABASE_URL = "https://oxjiebmdvylvjyuclidr.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im94amllYm1kdnlsdmp5dWNsaWRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MTE5MzAsImV4cCI6MjA5NDA4NzkzMH0.JLOnzjpvVK7cg0994ne9yUgaezvZ9hN6DngbmsoKxtU";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
     let syncTimer = null;
     const GROUPS = ["A","B","C","D","E","F","G","H","I","J","K","L"];
