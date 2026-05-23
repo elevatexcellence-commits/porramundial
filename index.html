@@ -1861,9 +1861,7 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
       <nav class="nav">
         <button id="tabRules" class="active" onclick="showTab('rules')">Inicio y reglas</button>
         <button id="tabPredictions" onclick="showTab('predictions')">Predicciones</button>
-        <button id="tabGroups" onclick="showTab('groups')">Grupos</button>
         <button id="tabBracket" onclick="showTab('bracket')">Bracket</button>
-        <button id="tabKnockouts" onclick="showTab('knockouts')">Knockouts</button>
         <button id="tabLeaderboard" onclick="showTab('leaderboard')">Ranking</button>
         <button id="tabAdmin" class="hidden" onclick="showTab('admin')">Admin</button>
       </nav>
@@ -1968,7 +1966,7 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
           </div>
         </div>
         <div class="alert">
-          El bracket muestra todos los cruces y se va actualizando automáticamente con los equipos que clasifican según los resultados cargados.
+          El bracket se actualiza automáticamente a medida que se completan los grupos y avanzan los equipos en cada eliminatoria.
         </div>
         <div id="bracketView" class="bracket"></div>
       </section>
@@ -2022,8 +2020,8 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
   </main>
 
   <script>
-    const APP_VERSION = "bf-world-cup-2026-v30-supabase-fixed";
-    const STORAGE_KEY = "quiniela_mundial_2026_bf_v30_supabase_cache";
+    const APP_VERSION = "bf-world-cup-2026-v32-auto-refresh";
+    const STORAGE_KEY = "quiniela_mundial_2026_bf_v32_supabase_cache";
     const ADMIN_PIN = "2026";
 
     // Supabase connection
@@ -2035,7 +2033,10 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
     const GROUPS = ["A","B","C","D","E","F","G","H","I","J","K","L"];
     const LIVE_RESULTS_ENDPOINT = ""; // Opcional: pega aquí una URL/API propia que devuelva resultados en JSON.
     const LIVE_SYNC_INTERVAL_MS = 60000;
+    const RESULTS_REFRESH_INTERVAL_MS = 3 * 60 * 1000; // 3 minutos
     let liveSyncTimer = null;
+    let resultsRefreshTimer = null;
+    let resultsRefreshInProgress = false;
 
     const FLAG_CODES = {
       MEX: "mx", RSA: "za", KOR: "kr", CZE: "cz",
@@ -2053,11 +2054,162 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
     };
 
 
-    // Fase 1 v5:
-    // Las listas oficiales de jugadores todavía no están publicadas por FIFA.
-    // Cuando FIFA publique la lista final de 23-26 jugadores por selección, se rellenará este array con:
-    // { id: "ARG_LIONEL_MESSI", name: "Lionel Messi", teamId: "ARG" }
-    const GOLDEN_BOOT_PLAYERS = [];
+    const GOLDEN_BOOT_PLAYERS = [
+      { id: "ARG_LIONEL_MESSI", name: "Lionel Messi", teamId: "ARG" },
+      { id: "ARG_JULIAN_ALVAREZ", name: "Julián Álvarez", teamId: "ARG" },
+      { id: "ARG_LAUTARO_MARTINEZ", name: "Lautaro Martínez", teamId: "ARG" },
+      { id: "ARG_PAULO_DYBALA", name: "Paulo Dybala", teamId: "ARG" },
+      { id: "ARG_ALEXIS_MAC_ALLISTER", name: "Alexis Mac Allister", teamId: "ARG" },
+      { id: "FRA_KYLIAN_MBAPPE", name: "Kylian Mbappé", teamId: "FRA" },
+      { id: "FRA_ANTOINE_GRIEZMANN", name: "Antoine Griezmann", teamId: "FRA" },
+      { id: "FRA_MARCUS_THURAM", name: "Marcus Thuram", teamId: "FRA" },
+      { id: "FRA_OUSMANE_DEMBELE", name: "Ousmane Dembélé", teamId: "FRA" },
+      { id: "FRA_RANDAL_KOLO_MUANI", name: "Randal Kolo Muani", teamId: "FRA" },
+      { id: "POR_CRISTIANO_RONALDO", name: "Cristiano Ronaldo", teamId: "POR" },
+      { id: "POR_GONCALO_RAMOS", name: "Gonçalo Ramos", teamId: "POR" },
+      { id: "POR_JOAO_FELIX", name: "João Félix", teamId: "POR" },
+      { id: "POR_BERNARDO_SILVA", name: "Bernardo Silva", teamId: "POR" },
+      { id: "POR_BRUNO_FERNANDES", name: "Bruno Fernandes", teamId: "POR" },
+      { id: "BRA_VINICIUS_JR", name: "Vinícius Júnior", teamId: "BRA" },
+      { id: "BRA_RODRYGO", name: "Rodrygo", teamId: "BRA" },
+      { id: "BRA_RAPHINHA", name: "Raphinha", teamId: "BRA" },
+      { id: "BRA_ENDRICK", name: "Endrick", teamId: "BRA" },
+      { id: "BRA_RICHARLISON", name: "Richarlison", teamId: "BRA" },
+      { id: "BRA_NEYMAR", name: "Neymar", teamId: "BRA" },
+      { id: "ENG_HARRY_KANE", name: "Harry Kane", teamId: "ENG" },
+      { id: "ENG_JUDE_BELLINGHAM", name: "Jude Bellingham", teamId: "ENG" },
+      { id: "ENG_BUKAYO_SAKA", name: "Bukayo Saka", teamId: "ENG" },
+      { id: "ENG_PHIL_FODEN", name: "Phil Foden", teamId: "ENG" },
+      { id: "ENG_COLE_PALMER", name: "Cole Palmer", teamId: "ENG" },
+      { id: "ENG_MARCUS_RASHFORD", name: "Marcus Rashford", teamId: "ENG" },
+      { id: "ESP_ALVARO_MORATA", name: "Álvaro Morata", teamId: "ESP" },
+      { id: "ESP_LAMINE_YAMAL", name: "Lamine Yamal", teamId: "ESP" },
+      { id: "ESP_NICO_WILLIAMS", name: "Nico Williams", teamId: "ESP" },
+      { id: "ESP_DANI_OLMO", name: "Dani Olmo", teamId: "ESP" },
+      { id: "ESP_FERRAN_TORRES", name: "Ferran Torres", teamId: "ESP" },
+      { id: "ESP_MIKEL_OYARZABAL", name: "Mikel Oyarzabal", teamId: "ESP" },
+      { id: "GER_JAMAL_MUSIALA", name: "Jamal Musiala", teamId: "GER" },
+      { id: "GER_FLORIAN_WIRTZ", name: "Florian Wirtz", teamId: "GER" },
+      { id: "GER_KAI_HAVERTZ", name: "Kai Havertz", teamId: "GER" },
+      { id: "GER_LEROY_SANE", name: "Leroy Sané", teamId: "GER" },
+      { id: "GER_NICLAS_FULLKRUG", name: "Niclas Füllkrug", teamId: "GER" },
+      { id: "NED_MEMPHIS_DEPAY", name: "Memphis Depay", teamId: "NED" },
+      { id: "NED_CODY_GAKPO", name: "Cody Gakpo", teamId: "NED" },
+      { id: "NED_XAVI_SIMONS", name: "Xavi Simons", teamId: "NED" },
+      { id: "NED_DONNELL_MALEN", name: "Donyell Malen", teamId: "NED" },
+      { id: "BEL_ROMELU_LUKAKU", name: "Romelu Lukaku", teamId: "BEL" },
+      { id: "BEL_KEVIN_DE_BRUYNE", name: "Kevin De Bruyne", teamId: "BEL" },
+      { id: "BEL_LOIS_OPENDA", name: "Loïs Openda", teamId: "BEL" },
+      { id: "BEL_JEREMY_DOKU", name: "Jérémy Doku", teamId: "BEL" },
+      { id: "URU_DARWIN_NUNEZ", name: "Darwin Núñez", teamId: "URU" },
+      { id: "URU_LUIS_SUAREZ", name: "Luis Suárez", teamId: "URU" },
+      { id: "URU_FEDERICO_VALVERDE", name: "Federico Valverde", teamId: "URU" },
+      { id: "URU_FACUNDO_PELLISTRI", name: "Facundo Pellistri", teamId: "URU" },
+      { id: "COL_LUIS_DIAZ", name: "Luis Díaz", teamId: "COL" },
+      { id: "COL_JAMES_RODRIGUEZ", name: "James Rodríguez", teamId: "COL" },
+      { id: "COL_JHON_DURAN", name: "Jhon Durán", teamId: "COL" },
+      { id: "COL_RAFAEL_SANTOS_BORRE", name: "Rafael Santos Borré", teamId: "COL" },
+      { id: "CRO_ANDREJ_KRAMARIC", name: "Andrej Kramarić", teamId: "CRO" },
+      { id: "CRO_LUKA_MODRIC", name: "Luka Modrić", teamId: "CRO" },
+      { id: "CRO_IVAN_PERISIC", name: "Ivan Perišić", teamId: "CRO" },
+      { id: "MEX_SANTIAGO_GIMENEZ", name: "Santiago Giménez", teamId: "MEX" },
+      { id: "MEX_HIRVING_LOZANO", name: "Hirving Lozano", teamId: "MEX" },
+      { id: "MEX_RAUL_JIMENEZ", name: "Raúl Jiménez", teamId: "MEX" },
+      { id: "MEX_ALEXIS_VEGA", name: "Alexis Vega", teamId: "MEX" },
+      { id: "USA_CHRISTIAN_PULISIC", name: "Christian Pulisic", teamId: "USA" },
+      { id: "USA_FOLARIN_BALOGUN", name: "Folarin Balogun", teamId: "USA" },
+      { id: "USA_TIMOTHY_WEAH", name: "Timothy Weah", teamId: "USA" },
+      { id: "USA_GIO_REYNA", name: "Gio Reyna", teamId: "USA" },
+      { id: "CAN_ALPHONSO_DAVIES", name: "Alphonso Davies", teamId: "CAN" },
+      { id: "CAN_JONATHAN_DAVID", name: "Jonathan David", teamId: "CAN" },
+      { id: "CAN_CYLE_LARIN", name: "Cyle Larin", teamId: "CAN" },
+      { id: "MAR_ACHRAF_HAKIMI", name: "Achraf Hakimi", teamId: "MAR" },
+      { id: "MAR_YOUSSEF_EN_NESYRI", name: "Youssef En-Nesyri", teamId: "MAR" },
+      { id: "MAR_HAKIM_ZIYECH", name: "Hakim Ziyech", teamId: "MAR" },
+      { id: "MAR_BRAHIM_DIAZ", name: "Brahim Díaz", teamId: "MAR" },
+      { id: "SEN_SADIO_MANE", name: "Sadio Mané", teamId: "SEN" },
+      { id: "SEN_NICOLAS_JACKSON", name: "Nicolas Jackson", teamId: "SEN" },
+      { id: "SEN_ISMAILA_SARR", name: "Ismaïla Sarr", teamId: "SEN" },
+      { id: "EGY_MOHAMED_SALAH", name: "Mohamed Salah", teamId: "EGY" },
+      { id: "EGY_MOSTAFA_MOHAMED", name: "Mostafa Mohamed", teamId: "EGY" },
+      { id: "EGY_TREZEGUET", name: "Trézéguet", teamId: "EGY" },
+      { id: "NOR_ERLING_HAALAND", name: "Erling Haaland", teamId: "NOR" },
+      { id: "NOR_MARTIN_ODEGAARD", name: "Martin Ødegaard", teamId: "NOR" },
+      { id: "NOR_ALEXANDER_SORLOTH", name: "Alexander Sørloth", teamId: "NOR" },
+      { id: "SWE_ALEXANDER_ISAK", name: "Alexander Isak", teamId: "SWE" },
+      { id: "SWE_VIKTOR_GYOKERES", name: "Viktor Gyökeres", teamId: "SWE" },
+      { id: "SWE_DEJAN_KULUSEVSKI", name: "Dejan Kulusevski", teamId: "SWE" },
+      { id: "SUI_BREEL_EMBOLO", name: "Breel Embolo", teamId: "SUI" },
+      { id: "SUI_XHERDAN_SHAQIRI", name: "Xherdan Shaqiri", teamId: "SUI" },
+      { id: "SUI_ZEKI_AMDOUNI", name: "Zeki Amdouni", teamId: "SUI" },
+      { id: "TUR_HAKAN_CALHANOGLU", name: "Hakan Çalhanoğlu", teamId: "TUR" },
+      { id: "TUR_ARDA_GULER", name: "Arda Güler", teamId: "TUR" },
+      { id: "TUR_KENAN_YILDIZ", name: "Kenan Yıldız", teamId: "TUR" },
+      { id: "JPN_TAKEFUSA_KUBO", name: "Takefusa Kubo", teamId: "JPN" },
+      { id: "JPN_KAORU_MITOMA", name: "Kaoru Mitoma", teamId: "JPN" },
+      { id: "JPN_TAKUMI_MINAMINO", name: "Takumi Minamino", teamId: "JPN" },
+      { id: "JPN_AYASE_UEDA", name: "Ayase Ueda", teamId: "JPN" },
+      { id: "KOR_SON_HEUNG_MIN", name: "Son Heung-min", teamId: "KOR" },
+      { id: "KOR_HWANG_HEE_CHAN", name: "Hwang Hee-chan", teamId: "KOR" },
+      { id: "KOR_LEE_KANG_IN", name: "Lee Kang-in", teamId: "KOR" },
+      { id: "AUS_MITCHELL_DUKE", name: "Mitchell Duke", teamId: "AUS" },
+      { id: "AUS_MARTIN_BOYLE", name: "Martin Boyle", teamId: "AUS" },
+      { id: "AUS_CRAIG_GOODWIN", name: "Craig Goodwin", teamId: "AUS" },
+      { id: "GHA_MOHAMMED_KUDUS", name: "Mohammed Kudus", teamId: "GHA" },
+      { id: "GHA_INAKI_WILLIAMS", name: "Iñaki Williams", teamId: "GHA" },
+      { id: "GHA_JORDAN_AYEW", name: "Jordan Ayew", teamId: "GHA" },
+      { id: "CIV_SEBASTIEN_HALLER", name: "Sébastien Haller", teamId: "CIV" },
+      { id: "CIV_SIMON_ADINGRA", name: "Simon Adingra", teamId: "CIV" },
+      { id: "CIV_FRANCK_KESSIE", name: "Franck Kessié", teamId: "CIV" },
+      { id: "PAR_MIGUEL_ALMIRON", name: "Miguel Almirón", teamId: "PAR" },
+      { id: "PAR_JULIO_ENCISO", name: "Julio Enciso", teamId: "PAR" },
+      { id: "PAR_ANTONIO_SANABRIA", name: "Antonio Sanabria", teamId: "PAR" },
+      { id: "ECU_ENNER_VALENCIA", name: "Enner Valencia", teamId: "ECU" },
+      { id: "ECU_MOISES_CAICEDO", name: "Moisés Caicedo", teamId: "ECU" },
+      { id: "ECU_KEVIN_RODRIGUEZ", name: "Kevin Rodríguez", teamId: "ECU" },
+      { id: "ALG_RIYAD_MAHREZ", name: "Riyad Mahrez", teamId: "ALG" },
+      { id: "ALG_AMINE_GOUIRI", name: "Amine Gouiri", teamId: "ALG" },
+      { id: "ALG_SAID_BENRAHMA", name: "Saïd Benrahma", teamId: "ALG" },
+      { id: "AUT_MARKO_ARNAUTOVIC", name: "Marko Arnautović", teamId: "AUT" },
+      { id: "AUT_MARCEL_SABITZER", name: "Marcel Sabitzer", teamId: "AUT" },
+      { id: "AUT_MICHAEL_GREGORITSCH", name: "Michael Gregoritsch", teamId: "AUT" },
+      { id: "CZE_PATRIK_SCHICK", name: "Patrik Schick", teamId: "CZE" },
+      { id: "CZE_ADAM_HLOZEK", name: "Adam Hložek", teamId: "CZE" },
+      { id: "CZE_TOMAS_SOUCEK", name: "Tomáš Souček", teamId: "CZE" },
+      { id: "SCO_SCOTT_MCTOMINAY", name: "Scott McTominay", teamId: "SCO" },
+      { id: "SCO_CHE_ADAMS", name: "Che Adams", teamId: "SCO" },
+      { id: "SCO_JOHN_MCGINN", name: "John McGinn", teamId: "SCO" },
+      { id: "TUN_YOUSSEF_MSAKNI", name: "Youssef Msakni", teamId: "TUN" },
+      { id: "TUN_ELIAS_ACHOURI", name: "Elias Achouri", teamId: "TUN" },
+      { id: "IRN_MEHDI_TAREMI", name: "Mehdi Taremi", teamId: "IRN" },
+      { id: "IRN_SARDAR_AZMOUN", name: "Sardar Azmoun", teamId: "IRN" },
+      { id: "NZL_CHRIS_WOOD", name: "Chris Wood", teamId: "NZL" },
+      { id: "NZL_MATTHEW_GARBETT", name: "Matthew Garbett", teamId: "NZL" },
+      { id: "KSA_SALEM_AL_DAWSARI", name: "Salem Al-Dawsari", teamId: "KSA" },
+      { id: "KSA_FIRAS_AL_BURAIKAN", name: "Firas Al-Buraikan", teamId: "KSA" },
+      { id: "QAT_AKRAM_AFIF", name: "Akram Afif", teamId: "QAT" },
+      { id: "QAT_ALMOEZ_ALI", name: "Almoez Ali", teamId: "QAT" },
+      { id: "RSA_PERCY_TAU", name: "Percy Tau", teamId: "RSA" },
+      { id: "RSA_THEMBA_ZWANE", name: "Themba Zwane", teamId: "RSA" },
+      { id: "PAN_JOSE_FAJARDO", name: "José Fajardo", teamId: "PAN" },
+      { id: "PAN_ISMAEL_DIAZ", name: "Ismael Díaz", teamId: "PAN" },
+      { id: "HAI_FRANTZDY_PIERROT", name: "Frantzdy Pierrot", teamId: "HAI" },
+      { id: "HAI_DUCKENS_NAZON", name: "Duckens Nazon", teamId: "HAI" },
+      { id: "CPV_BEBE", name: "Bebé", teamId: "CPV" },
+      { id: "CPV_RYAN_MENDES", name: "Ryan Mendes", teamId: "CPV" },
+      { id: "JOR_MUSA_AL_TAAMARI", name: "Musa Al-Taamari", teamId: "JOR" },
+      { id: "JOR_YAZAN_AL_NAIMAT", name: "Yazan Al-Naimat", teamId: "JOR" },
+      { id: "UZB_ELDOR_SHOMURODOV", name: "Eldor Shomurodov", teamId: "UZB" },
+      { id: "UZB_ABBOSBEK_FAYZULLAEV", name: "Abbosbek Fayzullaev", teamId: "UZB" },
+      { id: "IRQ_AYMEN_HUSSEIN", name: "Aymen Hussein", teamId: "IRQ" },
+      { id: "IRQ_ALI_JASIM", name: "Ali Jasim", teamId: "IRQ" },
+      { id: "BIH_EDIN_DZEKO", name: "Edin Džeko", teamId: "BIH" },
+      { id: "BIH_ERMEDIN_DEMIROVIC", name: "Ermedin Demirović", teamId: "BIH" },
+      { id: "COD_CEDRIC_BAKAMBU", name: "Cédric Bakambu", teamId: "COD" },
+      { id: "COD_YOANE_WISSA", name: "Yoane Wissa", teamId: "COD" },
+      { id: "CUW_RANGEELO_JANGA", name: "Rangelo Janga", teamId: "CUW" },
+      { id: "CUW_LEANDRO_BACUNA", name: "Leandro Bacuna", teamId: "CUW" }
+    ];
 
 
     const TEAMS = {
@@ -4422,6 +4574,7 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
     }
 
     async function logout() {
+      stopAutoResultsRefresh();
       await supabaseClient.auth.signOut();
       currentUser = null;
       sessionStorage.removeItem("quiniela_current_user_bf_v6_auth");
@@ -4451,6 +4604,7 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
       document.getElementById("welcomeTitle").textContent = `Bienvenido, ${currentUser.name}${currentUser.role === "admin" ? " · Admin" : ""}`;
       updateAdminVisibility();
       refreshAll();
+      startAutoResultsRefresh();
     }
 
     function showTab(tab) {
@@ -4458,15 +4612,13 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
         alert("No tienes permisos de administrador.");
         tab = "rules";
       }
-      const tabs = ["rules", "predictions", "groups", "bracket", "knockouts", "leaderboard", "admin"];
+      const tabs = ["rules", "predictions", "bracket", "leaderboard", "admin"];
       tabs.forEach((item) => {
         document.getElementById(`${item}Tab`).classList.toggle("hidden", item !== tab);
         document.getElementById(`tab${capitalize(item)}`).classList.toggle("active", item === tab);
       });
       updateAdminVisibility();
-      if (tab === "groups") renderGroups();
       if (tab === "bracket") renderBracket();
-      if (tab === "knockouts") renderKnockouts();
       if (tab === "leaderboard") renderLeaderboard();
       if (tab === "admin") { renderAdminTools(); renderAdminMatches(); }
     }
@@ -4541,8 +4693,9 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
     }
 
     function getResolvedTeamId(match, side) {
-      if (match.type === "group") return side === "home" ? match.homeTeamId : match.awayTeamId;
-      return resolveReference(side === "home" ? match.homeRef : match.awayRef);
+      const directTeamId = side === "home" ? match.homeTeamId : match.awayTeamId;
+      if (match.type === "group") return directTeamId;
+      return directTeamId || resolveReference(side === "home" ? match.homeRef : match.awayRef);
     }
 
     function resolveReference(ref) {
@@ -4725,7 +4878,6 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
       const goldenBootPoints = getGoldenBootBonusPoints(currentUser.id);
       const teams = Object.values(TEAMS).sort((a,b) => a.name.localeCompare(b.name));
       const selectedChampion = bonus?.championTeamId || "";
-      const hasOfficialPlayers = GOLDEN_BOOT_PLAYERS.length > 0;
 
       box.innerHTML = `
         <div class="bonus-card">
@@ -4750,12 +4902,12 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
             </div>
             <div>
               <label for="bonusGoldenBoot">Ganador Bota de Oro</label>
-              <select id="bonusGoldenBoot" ${locked || !hasOfficialPlayers ? "disabled" : ""}>
-                <option value="">${hasOfficialPlayers ? "Seleccionar jugador" : "Listas oficiales pendientes de publicación"}</option>
-                ${GOLDEN_BOOT_PLAYERS.map((player) => `<option value="${escapeHtml(player.name)}" ${bonus?.goldenBootPlayer === player.name ? "selected" : ""}>${escapeHtml(player.name)} · ${teamName(player.teamId)}</option>`).join("")}
-              </select>
+              <input id="bonusGoldenBoot" list="goldenBootPlayersList" type="text" placeholder="Escribe o selecciona un jugador" value="${escapeHtml(bonus?.goldenBootPlayer || "")}" ${locked ? "disabled" : ""} />
+              <datalist id="goldenBootPlayersList">
+                ${GOLDEN_BOOT_PLAYERS.map((player) => `<option value="${escapeHtml(player.name)}" label="${escapeHtml(teamName(player.teamId))}"></option>`).join("")}
+              </datalist>
               <div class="official-player-note">
-                El selector está preparado para usar las listas oficiales. FIFA publicará las listas finales después del plazo de presentación; hasta entonces no he incluido nombres para evitar jugadores no oficiales.
+                Puedes escribir cualquier jugador o elegir uno de la lista sugerida. Si el jugador no aparece, escríbelo manualmente y guárdalo.
               </div>
             </div>
           </div>
@@ -4774,8 +4926,8 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
       }
       const championRadio = document.querySelector('input[name="bonusChampion"]:checked');
       const championTeamId = championRadio ? championRadio.value : "";
-      const goldenBootSelect = document.getElementById("bonusGoldenBoot");
-      const goldenBootPlayer = goldenBootSelect && !goldenBootSelect.disabled ? goldenBootSelect.value.trim() : (getBonusPrediction(currentUser.id)?.goldenBootPlayer || "");
+      const goldenBootInput = document.getElementById("bonusGoldenBoot");
+      const goldenBootPlayer = goldenBootInput && !goldenBootInput.disabled ? goldenBootInput.value.trim() : (getBonusPrediction(currentUser.id)?.goldenBootPlayer || "");
       let bonus = getBonusPrediction(currentUser.id);
       if (!bonus) {
         bonus = { id: crypto.randomUUID(), userId: currentUser.id, championTeamId, goldenBootPlayer, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
@@ -5885,10 +6037,59 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
       if (!currentUser) return;
       refreshStats();
       renderPredictions();
-      renderGroups();
       renderBracket();
-      renderKnockouts();
       renderLeaderboard();
+    }
+
+    function refreshCurrentUserFromState() {
+      if (!currentUser) return;
+      const updatedProfile = state.users.find((user) => user.id === currentUser.id);
+      if (!updatedProfile) return;
+      currentUser = getSafeUser(updatedProfile);
+      sessionStorage.setItem("quiniela_current_user_bf_v6_auth", JSON.stringify(currentUser));
+      const welcome = document.getElementById("welcomeTitle");
+      if (welcome) welcome.textContent = `Bienvenido, ${currentUser.name}${currentUser.role === "admin" ? " · Admin" : ""}`;
+      updateAdminVisibility();
+    }
+
+    async function refreshResultsFromSupabase() {
+      if (!currentUser || document.hidden || resultsRefreshInProgress) return;
+
+      resultsRefreshInProgress = true;
+      try {
+        await loadStateFromSupabase();
+        refreshCurrentUserFromState();
+        state.live = {
+          lastSync: new Date().toISOString(),
+          lastMessage: "Resultados actualizados desde Supabase"
+        };
+        refreshAll();
+        refreshLiveStatus();
+        if (isCurrentUserAdmin() && adminUnlocked) {
+          renderAdminTools();
+          renderAdminMatches();
+        }
+      } catch (error) {
+        console.error("Error refrescando resultados", error);
+        state.live = {
+          lastSync: new Date().toISOString(),
+          lastMessage: `Error refrescando resultados: ${error.message || error}`
+        };
+        refreshLiveStatus();
+      } finally {
+        resultsRefreshInProgress = false;
+      }
+    }
+
+    function startAutoResultsRefresh() {
+      stopAutoResultsRefresh();
+      if (!currentUser || document.hidden) return;
+      resultsRefreshTimer = setInterval(refreshResultsFromSupabase, RESULTS_REFRESH_INTERVAL_MS);
+    }
+
+    function stopAutoResultsRefresh() {
+      if (resultsRefreshTimer) clearInterval(resultsRefreshTimer);
+      resultsRefreshTimer = null;
     }
 
     function formatDayKey(dateString) {
@@ -5962,6 +6163,18 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
       setInterval(update, 1000);
     }
 
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        stopAutoResultsRefresh();
+        return;
+      }
+
+      if (currentUser) {
+        refreshResultsFromSupabase();
+        startAutoResultsRefresh();
+      }
+    });
 
     window.addEventListener("load", async () => {
       startKickoffCountdown();
