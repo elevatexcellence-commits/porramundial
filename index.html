@@ -1865,7 +1865,7 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
         <button id="tabBracket" onclick="showTab('bracket')">Bracket</button>
         <button id="tabKnockouts" onclick="showTab('knockouts')">Knockouts</button>
         <button id="tabLeaderboard" onclick="showTab('leaderboard')">Ranking</button>
-        <button id="tabAdmin" onclick="showTab('admin')">Admin</button>
+        <button id="tabAdmin" class="hidden" onclick="showTab('admin')">Admin</button>
       </nav>
 
       <section id="rulesTab" class="card">
@@ -2001,17 +2001,8 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
           </div>
         </div>
 
-        <div id="adminAccess">
-          <div class="alert">Para esta demo, el PIN de administrador es <strong>2026</strong>.</div>
-          <div class="grid-2">
-            <div>
-              <label for="adminPin">PIN administrador</label>
-              <input id="adminPin" type="password" placeholder="Introduce PIN" />
-            </div>
-          </div>
-          <div class="actions">
-            <button class="btn-dark" onclick="unlockAdmin()">Acceder al panel</button>
-          </div>
+        <div id="adminAccess" class="hidden">
+          <div class="alert">Solo los usuarios marcados como <strong>admin</strong> en Supabase pueden acceder a este panel.</div>
         </div>
 
         <div id="adminPanel" class="hidden">
@@ -4294,7 +4285,7 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
           if (error) throw error;
         }
 
-        if (currentUser.role === "admin" || adminUnlocked) {
+        if (isCurrentUserAdmin()) {
           const matchRows = state.matches.map(stateMatchToDb);
           if (matchRows.length) {
             const { error } = await supabaseClient
@@ -4438,19 +4429,41 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
       document.getElementById("appSection").classList.add("hidden");
     }
 
+    function isCurrentUserAdmin() {
+      return currentUser?.role === "admin";
+    }
+
+    function updateAdminVisibility() {
+      const adminTabButton = document.getElementById("tabAdmin");
+      const adminAccess = document.getElementById("adminAccess");
+      const adminPanel = document.getElementById("adminPanel");
+      const isAdmin = isCurrentUserAdmin();
+
+      if (adminTabButton) adminTabButton.classList.toggle("hidden", !isAdmin);
+      if (adminAccess) adminAccess.classList.add("hidden");
+      if (adminPanel) adminPanel.classList.toggle("hidden", !isAdmin);
+      adminUnlocked = isAdmin;
+    }
+
     function openApp() {
       document.getElementById("loginSection").classList.add("hidden");
       document.getElementById("appSection").classList.remove("hidden");
       document.getElementById("welcomeTitle").textContent = `Bienvenido, ${currentUser.name}${currentUser.role === "admin" ? " · Admin" : ""}`;
+      updateAdminVisibility();
       refreshAll();
     }
 
     function showTab(tab) {
+      if (tab === "admin" && !isCurrentUserAdmin()) {
+        alert("No tienes permisos de administrador.");
+        tab = "rules";
+      }
       const tabs = ["rules", "predictions", "groups", "bracket", "knockouts", "leaderboard", "admin"];
       tabs.forEach((item) => {
         document.getElementById(`${item}Tab`).classList.toggle("hidden", item !== tab);
         document.getElementById(`tab${capitalize(item)}`).classList.toggle("active", item === tab);
       });
+      updateAdminVisibility();
       if (tab === "groups") renderGroups();
       if (tab === "bracket") renderBracket();
       if (tab === "knockouts") renderKnockouts();
@@ -5590,6 +5603,7 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
     }
 
     function renderAdminTools() {
+      if (!isCurrentUserAdmin()) return;
       const box = document.getElementById("adminTools");
       if (!box) return;
       const teams = Object.values(TEAMS).sort((a,b) => a.name.localeCompare(b.name));
@@ -5707,9 +5721,8 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
     }
 
     function unlockAdmin() {
-      const pin = document.getElementById("adminPin").value.trim();
-      if (pin !== ADMIN_PIN) {
-        alert("PIN incorrecto.");
+      if (!isCurrentUserAdmin()) {
+        alert("No tienes permisos de administrador.");
         return;
       }
       adminUnlocked = true;
@@ -5720,7 +5733,7 @@ Conectado a Supabase: usuarios, predicciones y ranking se guardan en una base de
     }
 
     function renderAdminMatches() {
-      if (!adminUnlocked) return;
+      if (!isCurrentUserAdmin()) return;
 
       const filterEl = document.getElementById("adminStageFilter");
       const searchEl = document.getElementById("adminSearch");
