@@ -1970,13 +1970,7 @@
              style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;opacity:.55;" />
         <!-- Overlay gradiente -->
         <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.88) 0%,rgba(0,0,0,.42) 52%,rgba(0,0,0,.1) 100%);"></div>
-        <!-- Contenido: texto izquierda, Fer derecha -->
-        <div style="position:relative;z-index:2;width:100%;display:flex;align-items:center;justify-content:space-between;padding:clamp(18px,4vw,40px) clamp(18px,4vw,40px) clamp(18px,4vw,40px) clamp(18px,4vw,40px);gap:16px;">
-          <div>
-            <p style="color:var(--yellow);font-size:12px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px;">Brooklyn Fitboxing · Mundial 2026</p>
-            <h2 style="color:#fff;font-size:clamp(26px,4.5vw,48px);line-height:1.0;margin-bottom:0;text-shadow:0 2px 12px rgba(0,0,0,.5);">Quiniela<br>del Mundial</h2>
-          </div>
-        </div>
+   
       </div>
 
       <div id="loginMessage"></div>
@@ -2058,7 +2052,7 @@
             <div class="welcome-panel">
               <h3>Bienvenido a la Quiniela Mundial 2026 de Brooklyn Fitboxing</h3>
               <p>
-                Tu campo de batalla durante el Mundial. Registra tus predicciones antes de cada partido, sigue quién lidera el ranking en tiempo real y observa cómo avanza el Bracket a medida que se van conociendo los clasificados. Ojo: en cuanto pita el árbitro, las predicciones se cierran automáticamente. Sin excusas.
+                Tu campo de batalla durante el Mundial. Registra tus predicciones antes de cada partido, sigue quién lidera el ranking en tiempo real y observa cómo avanza la Fase final a medida que se van conociendo los clasificados. Ojo: en cuanto pita el árbitro, las predicciones se cierran automáticamente. Sin excusas.
               </p>
             </div>
 
@@ -2164,7 +2158,7 @@
           </div>
         </div>
         <div class="alert">
-          El bracket se actualiza automáticamente a medida que se completan los grupos y avanzan los equipos en cada eliminatoria.
+          La Fase final se actualiza automáticamente a medida que se completan los grupos y avanzan los equipos en cada eliminatoria.
         </div>
         <div id="bracketView" class="bracket"></div>
       </section>
@@ -5563,7 +5557,7 @@
 
             <div class="poster-center-v5">
               <div class="poster-hero">
-                <h2>MI BRACKET<br/>2026</h2>
+                <h2>FASE FINAL<br/>2026</h2>
               </div>
               <div class="center-final-card">
                 <h3>Final</h3>
@@ -5647,7 +5641,7 @@
 
     function saveBracketPrediction(matchNo) {
       if (isBracketPredictionLocked()) {
-        alert("El bracket personal ya está bloqueado porque el Mundial ha empezado.");
+        alert("La Fase final personal ya está bloqueada porque el Mundial ha empezado.");
         return;
       }
 
