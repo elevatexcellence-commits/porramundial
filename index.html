@@ -2212,8 +2212,8 @@
   </main>
 
   <script>
-    const APP_VERSION = "bf-world-cup-2026-v37-bonus-lock-players";
-    const STORAGE_KEY = "quiniela_mundial_2026_bf_v37_supabase_cache";
+    const APP_VERSION = "bf-world-cup-2026-v38-predictions-safe-save";
+    const STORAGE_KEY = "quiniela_mundial_2026_bf_v38_supabase_cache";
     const ADMIN_PIN = "2026";
 
     // Supabase connection
@@ -2229,6 +2229,7 @@
     let liveSyncTimer = null;
     let resultsRefreshTimer = null;
     let resultsRefreshInProgress = false;
+    let predictionSaveInProgress = false;
 
     const FLAG_CODES = {
       MEX: "mx", RSA: "za", KOR: "kr", CZE: "cz",
@@ -4833,17 +4834,40 @@
       };
     }
 
+    async function fetchAllRows(tableName, selectColumns = "*") {
+      const pageSize = 1000;
+      let from = 0;
+      let allRows = [];
+
+      while (true) {
+        const { data, error } = await supabaseClient
+          .from(tableName)
+          .select(selectColumns)
+          .range(from, from + pageSize - 1);
+
+        if (error) throw error;
+
+        const rows = data || [];
+        allRows = allRows.concat(rows);
+
+        if (rows.length < pageSize) break;
+        from += pageSize;
+      }
+
+      return allRows;
+    }
+
     async function loadStateFromSupabase() {
       try {
-        const [profilesResult, matchesResult, predictionsResult, bonusResult, awardsResult] = await Promise.all([
+        const [profilesResult, matchesResult, predictionsRows, bonusRows, awardsResult] = await Promise.all([
           supabaseClient.from("profiles").select("id,name,email,role,created_at,updated_at").order("name", { ascending: true }),
           supabaseClient.from("matches").select("*").order("match_no", { ascending: true }),
-          supabaseClient.from("predictions").select("*"),
-          supabaseClient.from("bonus_predictions").select("*"),
+          fetchAllRows("predictions", "*"),
+          fetchAllRows("bonus_predictions", "*"),
           supabaseClient.from("awards").select("*").eq("id", "world_cup_2026").maybeSingle()
         ]);
 
-        const errors = [profilesResult.error, matchesResult.error, predictionsResult.error, bonusResult.error, awardsResult.error].filter(Boolean);
+        const errors = [profilesResult.error, matchesResult.error, awardsResult.error].filter(Boolean);
         if (errors.length) throw errors[0];
 
         const remoteMatches = matchesResult.data?.length ? matchesResult.data.map(dbMatchToState) : structuredClone(INITIAL_MATCHES);
@@ -4859,8 +4883,8 @@
             updatedAt: profile.updated_at
           })),
           matches: remoteMatches,
-          predictions: (predictionsResult.data || []).map(dbPredictionToState),
-          bonusPredictions: (bonusResult.data || []).map(dbBonusToState),
+          predictions: predictionsRows.map(dbPredictionToState),
+          bonusPredictions: bonusRows.map(dbBonusToState),
           awards: {
             championTeamId: awardsResult.data?.champion_team_id || null,
             goldenBootPlayer: awardsResult.data?.golden_boot_player || "",
@@ -5468,15 +5492,41 @@
       `;
     }
 
-    function savePrediction(matchId) {
+    async function saveSinglePredictionToSupabase(prediction) {
+      const payload = {
+        user_id: prediction.userId,
+        match_id: prediction.matchId,
+        predicted_home_score: prediction.homeScore,
+        predicted_away_score: prediction.awayScore,
+        updated_at: new Date().toISOString()
+      };
+
+      const { data, error } = await supabaseClient
+        .from("predictions")
+        .upsert(payload, { onConflict: "user_id,match_id" })
+        .select("*")
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        prediction.id = data.id;
+        prediction.createdAt = data.created_at;
+        prediction.updatedAt = data.updated_at;
+      }
+    }
+
+    async function savePrediction(matchId) {
       const match = state.matches.find((item) => item.id === matchId);
       if (isMatchLocked(match)) {
         alert("Este partido ya está bloqueado.");
         return;
       }
 
-      const homeScore = Number(document.getElementById(`home-${matchId}`).value);
-      const awayScore = Number(document.getElementById(`away-${matchId}`).value);
+      const homeInput = document.getElementById(`home-${matchId}`);
+      const awayInput = document.getElementById(`away-${matchId}`);
+      const homeScore = Number(homeInput?.value);
+      const awayScore = Number(awayInput?.value);
 
       if (!Number.isInteger(homeScore) || !Number.isInteger(awayScore) || homeScore < 0 || awayScore < 0) {
         alert("Introduce marcadores válidos.");
@@ -5501,9 +5551,28 @@
         prediction.updatedAt = new Date().toISOString();
       }
 
-      saveState();
-      refreshAll();
-      alert("Predicción guardada correctamente.");
+      predictionSaveInProgress = true;
+      stopAutoResultsRefresh();
+
+      try {
+        await saveSinglePredictionToSupabase(prediction);
+        state.live = { lastSync: new Date().toISOString(), lastMessage: "Predicción guardada en Supabase" };
+        saveStateLocalOnly();
+        await loadStateFromSupabase();
+        refreshCurrentUserFromState();
+        refreshAll();
+        refreshLiveStatus();
+        alert("Predicción guardada correctamente.");
+      } catch (error) {
+        console.error("Error guardando predicción", error);
+        state.live = { lastSync: new Date().toISOString(), lastMessage: `Error guardando predicción: ${error.message || error}` };
+        saveStateLocalOnly();
+        refreshLiveStatus();
+        alert(`No se pudo guardar la predicción. ${error.message || error}`);
+      } finally {
+        predictionSaveInProgress = false;
+        startAutoResultsRefresh();
+      }
     }
 
     function getPrediction(userId, matchId) {
@@ -6571,7 +6640,7 @@
     }
 
     async function refreshResultsFromSupabase() {
-      if (!currentUser || document.hidden || resultsRefreshInProgress) return;
+      if (!currentUser || document.hidden || resultsRefreshInProgress || predictionSaveInProgress) return;
 
       resultsRefreshInProgress = true;
       try {
