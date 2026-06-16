@@ -1756,6 +1756,83 @@
 
 
 
+    /* v39 · navegación rápida de predicciones */
+    .prediction-quick-toolbar {
+      position: sticky;
+      top: 10px;
+      z-index: 50;
+      margin-bottom: 18px;
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(0,0,0,.10);
+      box-shadow: 0 14px 28px rgba(0,0,0,.14);
+      backdrop-filter: blur(10px);
+    }
+
+    .prediction-quick-toolbar h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .prediction-quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .prediction-quick-actions button {
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: #111;
+      color: var(--yellow);
+      border: 1px solid rgba(255,212,0,.35);
+      font-size: 13px;
+    }
+
+    .prediction-quick-actions button:hover {
+      border-color: var(--yellow);
+    }
+
+    .prediction-quick-actions select {
+      min-width: min(280px, 100%);
+      flex: 1 1 240px;
+      border-radius: 999px;
+      font-weight: 800;
+    }
+
+    .prediction-count-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 680px) {
+      .prediction-quick-toolbar {
+        top: 6px;
+        padding: 12px;
+      }
+
+      .prediction-quick-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .prediction-quick-actions select,
+      .prediction-count-pill {
+        grid-column: 1 / -1;
+      }
+    }
+
+
     .home-layout-with-ads {
       display: grid;
       grid-template-columns: minmax(170px, 220px) minmax(0, 1fr) minmax(170px, 220px);
@@ -2116,6 +2193,21 @@
 
         <div id="bonusPredictionBox"></div>
 
+        <div class="prediction-quick-toolbar">
+          <h3>Acceso rápido a partidos</h3>
+          <div class="prediction-quick-actions">
+            <button type="button" onclick="setPredictionDayFilter('today')">Hoy</button>
+            <button type="button" onclick="setPredictionDayFilter('tomorrow')">Mañana</button>
+            <button type="button" onclick="setPredictionDayFilter('next')">Próxima fecha</button>
+            <button type="button" onclick="setPredictionDayFilter('all')">Ver todos</button>
+            <select id="dayFilter" onchange="renderPredictions()">
+              <option value="all">Todos los días</option>
+            </select>
+            <span id="visiblePredictionsCount" class="prediction-count-pill">0 partidos visibles</span>
+          </div>
+        </div>
+
+
         <div class="filters">
           <select id="stageFilter" onchange="renderPredictions()">
             <option value="all">Todos los partidos</option>
@@ -2212,7 +2304,7 @@
   </main>
 
   <script>
-    const APP_VERSION = "bf-world-cup-2026-v38-predictions-safe-save";
+    const APP_VERSION = "bf-world-cup-2026-v39-prediction-quick-navigation";
     const STORAGE_KEY = "quiniela_mundial_2026_bf_v38_supabase_cache";
     const ADMIN_PIN = "2026";
 
@@ -5317,13 +5409,31 @@
         .map((row, index) => ({...row, qualified: index < 8}));
     }
 
-    function renderPredictions() {
-      renderBonusPrediction();
-      const list = document.getElementById("predictionsList");
-      const stageFilter = document.getElementById("stageFilter").value;
-      const search = document.getElementById("searchMatch").value.trim().toLowerCase();
 
-      const matches = state.matches.filter((match) => {
+
+    function getLocalDayKey(dateValue) {
+      const date = new Date(dateValue);
+      if (Number.isNaN(date.getTime())) return "";
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function getRelativeDayKey(offsetDays = 0) {
+      const date = new Date();
+      date.setHours(0, 0, 0, 0);
+      date.setDate(date.getDate() + offsetDays);
+      return getLocalDayKey(date);
+    }
+
+    function getPredictionFilterBaseMatches() {
+      const stageFilterEl = document.getElementById("stageFilter");
+      const searchEl = document.getElementById("searchMatch");
+      const stageFilter = stageFilterEl?.value || "all";
+      const search = (searchEl?.value || "").trim().toLowerCase();
+
+      return state.matches.filter((match) => {
         const homeId = getResolvedTeamId(match, "home");
         const awayId = getResolvedTeamId(match, "away");
         const text = `${match.stage} ${teamName(homeId)} ${teamName(awayId)} ${match.venue} ${match.matchNo}`.toLowerCase();
@@ -5337,9 +5447,78 @@
         const visibilityOk = match.type !== "knockout" || isKnockoutVisible(match);
         return visibilityOk && filterOk && (!search || text.includes(search));
       }).sort((a,b) => new Date(a.matchDate) - new Date(b.matchDate));
+    }
+
+    function populatePredictionDayFilter(baseMatches, selectedValue) {
+      const dayFilter = document.getElementById("dayFilter");
+      if (!dayFilter) return "all";
+
+      const existingValue = selectedValue || dayFilter.value || "all";
+      const days = Array.from(new Set(baseMatches.map((match) => getLocalDayKey(match.matchDate)).filter(Boolean)));
+
+      dayFilter.innerHTML = `
+        <option value="all">Todos los días</option>
+        ${days.map((dayKey) => {
+          const count = baseMatches.filter((match) => getLocalDayKey(match.matchDate) === dayKey).length;
+          return `<option value="${dayKey}">${formatDayTitle(dayKey)} · ${count} partido${count === 1 ? "" : "s"}</option>`;
+        }).join("")}
+      `;
+
+      if (existingValue !== "all" && days.includes(existingValue)) {
+        dayFilter.value = existingValue;
+        return existingValue;
+      }
+
+      dayFilter.value = "all";
+      return "all";
+    }
+
+    function setPredictionDayFilter(mode) {
+      const baseMatches = getPredictionFilterBaseMatches();
+      const dayFilter = document.getElementById("dayFilter");
+      if (!dayFilter) return;
+
+      let targetDay = "all";
+      const now = new Date();
+
+      if (mode === "today") {
+        targetDay = getRelativeDayKey(0);
+      } else if (mode === "tomorrow") {
+        targetDay = getRelativeDayKey(1);
+      } else if (mode === "next") {
+        const nextMatch = baseMatches.find((match) => new Date(match.matchDate) >= now);
+        targetDay = nextMatch ? getLocalDayKey(nextMatch.matchDate) : "all";
+      }
+
+      populatePredictionDayFilter(baseMatches, targetDay);
+      renderPredictions();
+
+      const predictionsTab = document.getElementById("predictionsTab");
+      if (predictionsTab) {
+        predictionsTab.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function renderPredictions() {
+      renderBonusPrediction();
+      const list = document.getElementById("predictionsList");
+      const visibleCounter = document.getElementById("visiblePredictionsCount");
+      const selectedDayBeforeRender = document.getElementById("dayFilter")?.value || "all";
+
+      const baseMatches = getPredictionFilterBaseMatches();
+      const dayFilterValue = populatePredictionDayFilter(baseMatches, selectedDayBeforeRender);
+
+      const matches = baseMatches.filter((match) => {
+        return dayFilterValue === "all" || getLocalDayKey(match.matchDate) === dayFilterValue;
+      });
+
+      if (visibleCounter) {
+        visibleCounter.textContent = `${matches.length} partido${matches.length === 1 ? "" : "s"} visible${matches.length === 1 ? "" : "s"}`;
+      }
 
       if (matches.length === 0) {
-        list.innerHTML = '<div class="alert">No hay partidos para este filtro.</div>';
+        const dayText = dayFilterValue === "all" ? "este filtro" : formatDayTitle(dayFilterValue);
+        list.innerHTML = `<div class="alert">No hay partidos para ${dayText}. Usa <strong>Próxima fecha</strong> o <strong>Ver todos</strong>.</div>`;
         return;
       }
 
