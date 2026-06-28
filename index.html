@@ -3375,6 +3375,31 @@
 
 
 
+  
+
+    /* v53 · solo bracket + fondo oscuro */
+    #bracketView.bracket {
+      background: #060b16;
+      border-radius: 28px;
+      padding: 12px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
+    }
+    #bracketView .bracket-poster.v5 {
+      background:
+        radial-gradient(circle at center, rgba(255,214,0,.06) 0%, rgba(255,214,0,0) 28%),
+        linear-gradient(180deg, #0a1222 0%, #08101d 100%);
+      border: 1px solid rgba(255,255,255,.05);
+      border-radius: 24px;
+    }
+    #bracketView .poster-groups,
+    #bracketView .poster-groups-title,
+    #bracketView .poster-group-card,
+    #bracketView .poster-group-table,
+    #bracketView .poster-group-head,
+    #bracketView .poster-group-row {
+      display: none !important;
+    }
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -7762,19 +7787,6 @@
               ${stageHtml("Octavos", "right")}
               ${stageHtml("Dieciseisavos", "right")}
             </div>
-          </div>
-          <div class="poster-groups">
-            <div class="poster-groups-title">GROUPS</div>
-            ${GROUPS.map((group) => {
-              const rows = getGroupStandings(group);
-              return `<div class="poster-group-card">
-                <h4>${group}</h4>
-                <div class="poster-group-table">
-                  <div class="poster-group-head"><span>#</span><span>Selección</span><span>PTS</span></div>
-                  ${rows.map((row, idx) => `<div class="poster-group-row ${idx < 2 ? "qualified" : ""}"><span>${idx + 1}</span><span>${renderMiniTeam(row.teamId)}</span><strong>${row.points}</strong></div>`).join("")}
-                </div>
-              </div>`;
-            }).join("")}
           </div>
         </div>
       `;
