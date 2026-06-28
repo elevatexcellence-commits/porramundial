@@ -2669,6 +2669,233 @@
       }
     }
 
+  
+
+    /* v47 · bracket mucho más ancho, limpio y centrado; solo banderas */
+    #bracketView .bracket-poster.v5 {
+      padding: 22px 20px 28px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      border-radius: 28px;
+    }
+
+    #bracketView .poster-board-v5 {
+      width: 1360px;
+      min-width: 1360px;
+      margin: 0 auto;
+      grid-template-columns: 500px 300px 500px;
+      gap: 30px;
+      align-items: start;
+    }
+
+    #bracketView .bracket-side-v5.left {
+      grid-template-columns: 170px 122px 104px 86px;
+      gap: 12px;
+    }
+
+    #bracketView .bracket-side-v5.right {
+      grid-template-columns: 86px 104px 122px 170px;
+      gap: 12px;
+    }
+
+    #bracketView .poster-round-v5 {
+      height: 760px;
+      grid-template-rows: 30px repeat(16, minmax(0, 1fr));
+      gap: 10px;
+      overflow: visible;
+    }
+
+    #bracketView .poster-round-v5 h3 {
+      justify-self: center;
+      align-self: center;
+      font-size: 11px;
+      padding: 6px 12px;
+      min-height: 28px;
+      border-radius: 999px;
+      letter-spacing: .12em;
+      white-space: nowrap;
+      width: auto;
+      max-width: 100%;
+      box-shadow: 0 8px 18px rgba(0,0,0,.16);
+    }
+
+    #bracketView .poster-match-v5 {
+      border-radius: 16px;
+      padding: 9px 10px 8px;
+      min-height: 70px;
+      background: linear-gradient(180deg, rgba(60,104,164,.54) 0%, rgba(34,74,128,.66) 100%);
+      border: 1px solid rgba(180, 210, 255, .18);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    #bracketView .poster-match-v5.hidden-ko {
+      min-height: 58px;
+      font-size: 10px;
+      color: rgba(255,255,255,.68);
+    }
+
+    #bracketView .poster-team-v5 {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 8px;
+      padding: 2px 0;
+    }
+
+    #bracketView .poster-team-v5.flag-only span {
+      white-space: normal;
+      overflow: visible;
+    }
+
+    #bracketView .poster-team-v5 strong {
+      min-width: 12px;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1;
+      color: var(--yellow);
+    }
+
+    #bracketView .bracket-flag-slot-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    #bracketView .bracket-flag-slot {
+      width: 24px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      overflow: hidden;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 1px 4px rgba(0,0,0,.18);
+      flex: 0 0 auto;
+    }
+
+    #bracketView .bracket-flag-slot img,
+    #bracketView .bracket-flag-slot .mini-flag-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    #bracketView .bracket-flag-slot.placeholder {
+      color: rgba(255,255,255,.72);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    #bracketView .poster-match-v5 small {
+      display: block;
+      margin-top: 6px;
+      font-size: 8.4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: rgba(255,255,255,.64);
+    }
+
+    #bracketView .poster-center-v5 {
+      min-height: 760px;
+      gap: 16px;
+      justify-content: flex-start;
+      padding-top: 8px;
+      position: relative;
+    }
+
+    #bracketView .poster-hero {
+      padding-top: 26px;
+      margin-bottom: 0;
+    }
+
+    #bracketView .poster-center-v5 h2 {
+      font-size: 38px;
+      line-height: .92;
+      letter-spacing: .08em;
+      margin: 0;
+      text-align: center;
+    }
+
+    #bracketView .center-final-card {
+      width: 100%;
+      max-width: 250px;
+      margin: 0 auto;
+      padding: 10px 12px 12px;
+      border-radius: 22px;
+    }
+
+    #bracketView .center-final-card > h3,
+    #bracketView .third-place-mini > h4 {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    #bracketView .third-place-mini {
+      width: 100%;
+      max-width: 220px;
+      margin: 0 auto;
+    }
+
+    #bracketView .poster-bottom-trophy {
+      margin-top: auto;
+      margin-bottom: 8px;
+    }
+
+    #bracketView .poster-bottom-trophy .poster-trophy-wrap {
+      width: 120px;
+      height: 160px;
+    }
+
+    #bracketView .poster-groups {
+      width: 1360px;
+      min-width: 1360px;
+      margin: 18px auto 0;
+    }
+
+    @media (max-width: 980px) {
+      #bracketView .poster-board-v5 {
+        width: 1240px;
+        min-width: 1240px;
+        grid-template-columns: 455px 260px 455px;
+        gap: 26px;
+      }
+      #bracketView .bracket-side-v5.left { grid-template-columns: 156px 112px 98px 75px; }
+      #bracketView .bracket-side-v5.right { grid-template-columns: 75px 98px 112px 156px; }
+      #bracketView .poster-round-v5 { height: 730px; }
+      #bracketView .poster-center-v5 { min-height: 730px; }
+      #bracketView .poster-center-v5 h2 { font-size: 34px; }
+      #bracketView .poster-groups { width: 1240px; min-width: 1240px; }
+    }
+
+    @media (max-width: 640px) {
+      #bracketView .bracket-poster.v5 {
+        padding: 12px 8px 18px;
+        border-radius: 20px;
+      }
+      #bracketView .poster-board-v5 {
+        width: 1180px;
+        min-width: 1180px;
+        grid-template-columns: 430px 250px 430px;
+        gap: 20px;
+      }
+      #bracketView .bracket-side-v5.left { grid-template-columns: 148px 108px 94px 62px; }
+      #bracketView .bracket-side-v5.right { grid-template-columns: 62px 94px 108px 148px; }
+      #bracketView .poster-round-v5 { height: 700px; gap: 8px; }
+      #bracketView .poster-round-v5 h3 { font-size: 10px; padding: 5px 10px; }
+      #bracketView .poster-match-v5 { min-height: 66px; padding: 8px 8px 7px; }
+      #bracketView .poster-center-v5 { min-height: 700px; }
+      #bracketView .poster-center-v5 h2 { font-size: 31px; }
+      #bracketView .center-final-card { max-width: 220px; }
+      #bracketView .third-place-mini { max-width: 200px; }
+      #bracketView .poster-bottom-trophy .poster-trophy-wrap { width: 110px; height: 145px; }
+      #bracketView .poster-groups { width: 1180px; min-width: 1180px; }
+    }
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -7077,12 +7304,16 @@
     function renderPosterMatchV5(match) {
       const homeId = getResolvedTeamId(match, "home");
       const awayId = getResolvedTeamId(match, "away");
-      const homeLabel = homeId ? renderMiniTeam(homeId) : `<span class="mini-team slot-placeholder">Por definir</span>`;
-      const awayLabel = awayId ? renderMiniTeam(awayId) : `<span class="mini-team slot-placeholder">Por definir</span>`;
+      const homeLabel = homeId
+        ? `<span class="bracket-flag-slot">${renderMiniFlagImg(homeId, teamFlag(homeId), `Bandera de ${teamName(homeId)}`)}</span>`
+        : `<span class="bracket-flag-slot placeholder">?</span>`;
+      const awayLabel = awayId
+        ? `<span class="bracket-flag-slot">${renderMiniFlagImg(awayId, teamFlag(awayId), `Bandera de ${teamName(awayId)}`)}</span>`
+        : `<span class="bracket-flag-slot placeholder">?</span>`;
       return `
         <div class="poster-match-v5">
-          <div class="poster-team-v5"><span>${homeLabel}</span><strong>${match.finished ? match.homeScore : ""}</strong></div>
-          <div class="poster-team-v5"><span>${awayLabel}</span><strong>${match.finished ? match.awayScore : ""}</strong></div>
+          <div class="poster-team-v5 flag-only"><span class="bracket-flag-slot-wrap">${homeLabel}</span><strong>${match.finished ? match.homeScore : ""}</strong></div>
+          <div class="poster-team-v5 flag-only"><span class="bracket-flag-slot-wrap">${awayLabel}</span><strong>${match.finished ? match.awayScore : ""}</strong></div>
           ${match.finished && match.winnerTeamId ? `<small>Avanza: ${teamName(match.winnerTeamId)}</small>` : `<small>Partido ${match.matchNo} · ${formatDate(match.matchDate)}</small>`}
         </div>
       `;
