@@ -2443,557 +2443,62 @@
 
   
 
-    /* v46 · bracket refinado estilo FIFA, mejor alineado desktop + móvil */
+    /* v49 · bracket inspirado en el cuadro FIFA de referencia */
+    #bracketView.bracket { display:block; width:100%; overflow:visible; }
     #bracketView .bracket-poster.v5 {
-      padding: 22px 18px 28px;
-      overflow-x: auto;
-      overflow-y: hidden;
+      width:100%; max-width:100%; overflow-x:auto !important; overflow-y:hidden;
+      padding:0 !important; border:0 !important; border-radius:22px !important;
+      background:transparent !important; box-shadow:none !important;
+      -webkit-overflow-scrolling:touch;
     }
-
-    #bracketView .poster-board-v5 {
-      width: 1120px;
-      min-width: 1120px;
-      margin: 0 auto;
-      grid-template-columns: 415px 250px 415px;
-      gap: 20px;
-      align-items: start;
+    #bracketView .fifa-bracket-board {
+      width:1360px; height:760px; margin:0 auto; position:relative; overflow:hidden;
+      border-radius:22px; color:#fff;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(255,213,55,.13), transparent 20%),
+        linear-gradient(90deg, rgba(34,100,173,.25) 0 8%, transparent 8% 18%, rgba(34,100,173,.13) 18% 27%, transparent 27% 73%, rgba(34,100,173,.13) 73% 82%, transparent 82% 92%, rgba(34,100,173,.25) 92% 100%),
+        linear-gradient(180deg, #07366f 0%, #092c5d 100%);
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 16px 35px rgba(1,15,42,.18);
     }
-
-    #bracketView .bracket-side-v5 {
-      align-items: start;
-      gap: 10px;
+    #bracketView .fifa-bracket-board::before {
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:linear-gradient(90deg, transparent 49.9%, rgba(255,255,255,.10) 50%, transparent 50.1%);
     }
-    #bracketView .bracket-side-v5.left {
-      grid-template-columns: 146px 116px 96px 72px;
-    }
-    #bracketView .bracket-side-v5.right {
-      grid-template-columns: 72px 96px 116px 146px;
-    }
-
-    #bracketView .poster-round-v5 {
-      height: 780px;
-      grid-template-rows: 34px repeat(16, minmax(0, 1fr));
-      gap: 10px;
-      overflow: visible;
-    }
-
-    #bracketView .poster-round-v5 h3 {
-      font-size: 12px;
-      line-height: 1;
-      padding: 6px 12px;
-      min-height: 30px;
-      width: max-content;
-      max-width: 100%;
-      justify-self: center;
-      letter-spacing: .12em;
-      box-shadow: 0 8px 20px rgba(0,0,0,.16);
-    }
-
-    #bracketView .poster-match-v5 {
-      padding: 10px 10px 8px;
-      border-radius: 14px;
-      min-height: 60px;
-      backdrop-filter: blur(2px);
-    }
-
-    #bracketView .poster-team-v5 {
-      font-size: 11px;
-      line-height: 1.18;
-      gap: 6px;
-    }
-
-    #bracketView .poster-match-v5 small {
-      display: block;
-      margin-top: 5px;
-      font-size: 8.8px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    #bracketView .poster-match-v5.hidden-ko {
-      font-size: 10px;
-      letter-spacing: .02em;
-    }
-
-    /* Conectores más visibles y limpios */
-    #bracketView .bracket-side-v5.left .poster-match-v5::after,
-    #bracketView .bracket-side-v5.right .poster-match-v5::after {
-      width: 14px;
-      border-top: 2px solid rgba(196, 223, 255, .42);
-    }
-    #bracketView .bracket-side-v5.left .poster-match-v5::after { right: -14px; }
-    #bracketView .bracket-side-v5.right .poster-match-v5::after { left: -14px; }
-
-    #bracketView .bracket-side-v5.left .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(odd)::before,
-    #bracketView .bracket-side-v5.left .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(even)::before,
-    #bracketView .bracket-side-v5.right .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(odd)::before,
-    #bracketView .bracket-side-v5.right .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(even)::before {
-      border-right: 2px solid rgba(196, 223, 255, .34);
-    }
-    #bracketView .bracket-side-v5.left .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(odd)::before,
-    #bracketView .bracket-side-v5.left .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(even)::before { right: -14px; }
-    #bracketView .bracket-side-v5.right .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(odd)::before,
-    #bracketView .bracket-side-v5.right .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(even)::before { left: -14px; }
-
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(1) { grid-row: 2 / span 2; }
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(2) { grid-row: 4 / span 2; }
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(3) { grid-row: 6 / span 2; }
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(4) { grid-row: 8 / span 2; }
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(5) { grid-row: 10 / span 2; }
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(6) { grid-row: 12 / span 2; }
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(7) { grid-row: 14 / span 2; }
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(8) { grid-row: 16 / span 2; }
-
-    #bracketView .poster-round-v5.octavos .poster-match-v5:nth-of-type(1) { grid-row: 3 / span 2; }
-    #bracketView .poster-round-v5.octavos .poster-match-v5:nth-of-type(2) { grid-row: 7 / span 2; }
-    #bracketView .poster-round-v5.octavos .poster-match-v5:nth-of-type(3) { grid-row: 11 / span 2; }
-    #bracketView .poster-round-v5.octavos .poster-match-v5:nth-of-type(4) { grid-row: 15 / span 2; }
-
-    #bracketView .poster-round-v5.cuartos .poster-match-v5:nth-of-type(1) { grid-row: 5 / span 3; }
-    #bracketView .poster-round-v5.cuartos .poster-match-v5:nth-of-type(2) { grid-row: 13 / span 3; }
-
-    #bracketView .poster-round-v5.semifinales .poster-match-v5:nth-of-type(1) { grid-row: 8 / span 4; }
-
-    #bracketView .poster-center-v5 {
-      min-height: 780px;
-      justify-content: flex-start;
-      gap: 18px;
-      padding: 8px 6px 0;
-      position: relative;
-    }
-
-    #bracketView .poster-hero {
-      padding-top: 34px;
-      margin-bottom: 0;
-    }
-
-    #bracketView .poster-center-v5 h2 {
-      font-size: 34px;
-      line-height: .95;
-      letter-spacing: .08em;
-      margin: 0;
-      text-align: center;
-    }
-
-    #bracketView .center-final-card {
-      width: 100%;
-      max-width: 220px;
-      margin: 0 auto;
-      padding: 12px 12px 10px;
-      border-radius: 22px;
-    }
-
-    #bracketView .third-place-mini {
-      width: 100%;
-      max-width: 208px;
-      margin: 0 auto;
-    }
-
-    #bracketView .poster-bottom-trophy {
-      margin-top: auto;
-      margin-bottom: 6px;
-    }
-
-    #bracketView .poster-bottom-trophy .poster-trophy-wrap {
-      width: 110px;
-      height: 148px;
-    }
-
-    #bracketView .poster-groups {
-      width: 1120px;
-      min-width: 1120px;
-      margin: 18px auto 0;
-      gap: 14px;
-    }
-
-    @media (max-width: 980px) {
-      #bracketView .bracket-poster.v5 { padding: 16px 14px 22px; }
-      #bracketView .poster-board-v5 {
-        width: 1040px;
-        min-width: 1040px;
-        grid-template-columns: 385px 230px 385px;
-        gap: 20px;
-      }
-      #bracketView .bracket-side-v5.left { grid-template-columns: 136px 106px 86px 57px; }
-      #bracketView .bracket-side-v5.right { grid-template-columns: 57px 86px 106px 136px; }
-      #bracketView .poster-round-v5 { height: 740px; }
-      #bracketView .poster-center-v5 { min-height: 740px; }
-      #bracketView .poster-center-v5 h2 { font-size: 30px; }
-      #bracketView .poster-groups { width: 1040px; min-width: 1040px; }
-    }
-
-    @media (max-width: 640px) {
-      #bracketView .bracket-poster.v5 { padding: 12px 10px 18px; }
-      #bracketView .poster-board-v5 {
-        width: 940px;
-        min-width: 940px;
-        grid-template-columns: 348px 190px 348px;
-        gap: 18px;
-      }
-      #bracketView .bracket-side-v5.left { grid-template-columns: 122px 94px 76px 50px; }
-      #bracketView .bracket-side-v5.right { grid-template-columns: 50px 76px 94px 122px; }
-      #bracketView .poster-round-v5 {
-        height: 690px;
-        gap: 8px;
-      }
-      #bracketView .poster-round-v5 h3 {
-        font-size: 10px;
-        padding: 5px 9px;
-        min-height: 28px;
-      }
-      #bracketView .poster-match-v5 {
-        padding: 8px 8px 7px;
-        border-radius: 12px;
-      }
-      #bracketView .poster-team-v5 { font-size: 10px; }
-      #bracketView .poster-match-v5 small { font-size: 8px; }
-      #bracketView .poster-center-v5 {
-        min-height: 690px;
-        gap: 14px;
-      }
-      #bracketView .poster-center-v5 h2 {
-        font-size: 26px;
-        line-height: .98;
-      }
-      #bracketView .center-final-card { max-width: 178px; }
-      #bracketView .third-place-mini { max-width: 170px; }
-      #bracketView .poster-bottom-trophy .poster-trophy-wrap {
-        width: 92px;
-        height: 124px;
-      }
-      #bracketView .poster-groups {
-        width: 940px;
-        min-width: 940px;
-        grid-template-columns: repeat(4, minmax(150px, 1fr));
-      }
-    }
+    #bracketView .fifa-title { position:absolute; left:50%; top:42px; transform:translateX(-50%); width:210px; text-align:center; z-index:4; }
+    #bracketView .fifa-title h2 { margin:0; color:#fff; font-size:27px; line-height:.95; font-weight:900; letter-spacing:-.02em; text-transform:uppercase; text-shadow:0 2px 8px rgba(0,0,0,.3); }
+    #bracketView .fifa-title p { margin:7px 0 0; color:#f8d345; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    #bracketView .fifa-stage-label { position:absolute; z-index:4; color:#fff; font-size:12px; font-weight:900; letter-spacing:.02em; text-transform:uppercase; text-shadow:0 1px 4px rgba(0,0,0,.28); }
+    #bracketView .fifa-stage-label.left { text-align:left; }
+    #bracketView .fifa-stage-label.right { text-align:right; }
+    #bracketView .fifa-match { position:absolute; z-index:4; width:76px; min-height:52px; box-sizing:border-box; border-radius:8px; border:1px solid rgba(245,246,248,.62); background:linear-gradient(180deg,#c5c7cc,#9da1a8); box-shadow:inset 0 1px 0 rgba(255,255,255,.58),0 3px 8px rgba(0,0,0,.19); padding:5px 7px; }
+    #bracketView .fifa-match.is-first { width:84px; background:rgba(6,60,121,.92); border-color:rgba(255,255,255,.24); box-shadow:inset 0 1px 0 rgba(255,255,255,.11),0 3px 8px rgba(0,0,0,.20); }
+    #bracketView .fifa-match.is-empty { display:grid; place-items:center; padding:0; }
+    #bracketView .fifa-match.is-empty .fifa-placeholder { width:100%; height:100%; display:grid; place-items:center; color:#e7e9ec; font-size:17px; font-weight:900; text-shadow:0 1px 1px rgba(0,0,0,.22); }
+    #bracketView .fifa-team-row { height:20px; display:flex; align-items:center; justify-content:space-between; gap:4px; }
+    #bracketView .fifa-flag { width:23px; height:15px; display:inline-flex; border-radius:2px; overflow:hidden; border:1px solid rgba(255,255,255,.38); background:rgba(255,255,255,.10); flex:0 0 auto; }
+    #bracketView .fifa-flag img,.fifa-flag .mini-flag-img { width:100%; height:100%; object-fit:cover; display:block; }
+    #bracketView .fifa-score { font-size:12px; color:#fff; font-weight:900; min-width:10px; text-align:right; }
+    #bracketView .fifa-meta { font-size:7.5px; color:rgba(255,255,255,.70); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    #bracketView .fifa-final-zone { position:absolute; z-index:4; left:50%; top:220px; transform:translateX(-50%); width:216px; text-align:center; }
+    #bracketView .fifa-final-zone h3 { margin:0 0 8px; color:#fff; font-size:15px; font-weight:900; letter-spacing:.05em; text-transform:uppercase; }
+    #bracketView .fifa-final-card { width:100px; min-height:58px; margin:0 auto; border-radius:8px; border:1px solid #edca43; background:linear-gradient(180deg,#c3c5ca,#a5a9b0); box-shadow:0 5px 12px rgba(0,0,0,.22); }
+    #bracketView .fifa-final-caption { margin:8px 0 0; color:#fff; font-size:13px; font-weight:900; text-transform:uppercase; }
+    #bracketView .fifa-trophy { position:absolute; z-index:4; left:50%; bottom:48px; transform:translateX(-50%); width:105px; height:142px; display:grid; place-items:center; filter:drop-shadow(0 10px 14px rgba(0,0,0,.36)); }
+    #bracketView .fifa-trophy img { max-width:100%; max-height:100%; object-fit:contain; }
+    #bracketView .fifa-third { position:absolute; z-index:4; left:50%; top:425px; transform:translateX(-50%); width:210px; text-align:center; }
+    #bracketView .fifa-third h4 { margin:0 0 7px; color:#fff; font-size:12px; font-weight:900; }
+    #bracketView .fifa-third-cards { display:flex; gap:30px; justify-content:center; align-items:center; }
+    #bracketView .fifa-third .fifa-match { position:relative; left:auto !important; top:auto !important; width:76px; min-height:47px; }
+    #bracketView .fifa-svg { position:absolute; inset:0; width:100%; height:100%; z-index:2; pointer-events:none; }
+    #bracketView .fifa-svg path { fill:none; stroke:rgba(255,255,255,.82); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+    #bracketView .poster-groups { width:1360px !important; min-width:1360px !important; margin:18px auto 0 !important; }
+    #bracketView .poster-groups-title { color:var(--yellow) !important; }
+    @media (max-width:900px){ #bracketView .fifa-bracket-board{ width:1360px; } #bracketView .poster-groups{width:1360px !important;min-width:1360px !important;} }
 
   
-
-    /* v48 · bracket final limpio, alineado y estilo FIFA */
-    #bracketView.bracket {
-      width: 100%;
-      overflow: visible;
-    }
-
-    #bracketView .bracket-poster.v5 {
-      padding: 18px 14px 26px !important;
-      border-radius: 26px;
-      overflow-x: auto !important;
-      overflow-y: visible !important;
-      -webkit-overflow-scrolling: touch;
-      background:
-        radial-gradient(circle at center 70%, rgba(255,214,0,.14), transparent 25%),
-        linear-gradient(180deg, #0b3670 0%, #0a2f62 58%, #082850 100%) !important;
-    }
-
-    #bracketView .poster-board-v5 {
-      width: 1500px !important;
-      min-width: 1500px !important;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 560px 320px 560px !important;
-      gap: 30px !important;
-      align-items: start !important;
-      position: relative;
-    }
-
-    #bracketView .poster-board-v5::before,
-    #bracketView .poster-board-v5::after {
-      content: "";
-      position: absolute;
-      top: 12px;
-      bottom: 12px;
-      width: 1px;
-      background: linear-gradient(180deg, transparent, rgba(255,255,255,.18) 8%, rgba(255,255,255,.18) 92%, transparent);
-      pointer-events: none;
-    }
-
-    #bracketView .poster-board-v5::before { left: calc(50% - 175px); }
-    #bracketView .poster-board-v5::after { right: calc(50% - 175px); }
-
-    #bracketView .bracket-side-v5.left {
-      display: grid;
-      grid-template-columns: 175px 135px 115px 95px !important;
-      gap: 14px !important;
-      align-items: start;
-    }
-
-    #bracketView .bracket-side-v5.right {
-      display: grid;
-      grid-template-columns: 95px 115px 135px 175px !important;
-      gap: 14px !important;
-      align-items: start;
-    }
-
-    #bracketView .poster-round-v5 {
-      display: grid !important;
-      grid-template-rows: 32px repeat(16, 40px) !important;
-      row-gap: 8px !important;
-      align-content: start;
-      min-width: 0;
-      padding: 0 !important;
-      position: relative;
-      overflow: visible;
-      height: 800px !important;
-    }
-
-    #bracketView .poster-round-v5 h3 {
-      grid-row: 1;
-      justify-self: center;
-      align-self: center;
-      margin: 0 !important;
-      padding: 6px 14px !important;
-      border-radius: 999px;
-      border: 1px solid rgba(255,214,0,.32);
-      background: rgba(255,214,0,.06);
-      color: var(--yellow);
-      font-size: 11px !important;
-      font-weight: 900;
-      letter-spacing: .12em;
-      white-space: nowrap;
-      text-transform: uppercase;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
-    }
-
-    #bracketView .poster-match-v5 {
-      position: relative;
-      min-height: 0 !important;
-      padding: 8px 8px 7px !important;
-      border-radius: 14px !important;
-      border: 1px solid rgba(180, 212, 255, .22) !important;
-      background: linear-gradient(180deg, rgba(62,108,171,.55), rgba(36,75,128,.70)) !important;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 10px 18px rgba(0,0,0,.12);
-      overflow: hidden;
-    }
-
-    #bracketView .poster-match-v5.hidden-ko {
-      display: grid;
-      place-items: center;
-      color: rgba(255,255,255,.72);
-      font-size: 11px !important;
-      border-style: dashed !important;
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04)) !important;
-    }
-
-    #bracketView .poster-team-v5 {
-      display: grid !important;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px !important;
-      line-height: 1;
-      padding: 1px 0 !important;
-    }
-
-    #bracketView .poster-team-v5 .team-slot {
-      display: inline-flex;
-      align-items: center;
-      justify-content: flex-start;
-      min-width: 0;
-    }
-
-    #bracketView .poster-team-v5 strong {
-      color: var(--yellow);
-      font-size: 12px;
-      font-weight: 900;
-      min-width: 10px;
-      text-align: right;
-    }
-
-    #bracketView .bracket-flag-only {
-      width: 26px;
-      height: 18px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      border-radius: 4px;
-      border: 1px solid rgba(255,255,255,.22);
-      background: rgba(255,255,255,.08);
-      box-shadow: 0 1px 4px rgba(0,0,0,.18);
-      flex: 0 0 auto;
-    }
-
-    #bracketView .bracket-flag-only img,
-    #bracketView .bracket-flag-only .mini-flag-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    #bracketView .bracket-flag-only.placeholder {
-      color: rgba(255,255,255,.78);
-      font-size: 12px;
-      font-weight: 900;
-    }
-
-    #bracketView .poster-match-v5 small {
-      display: block;
-      margin-top: 5px !important;
-      color: rgba(255,255,255,.68) !important;
-      font-size: 8.4px !important;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* Posicionamiento exacto por ronda */
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(1),
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(2),
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(3),
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(4),
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(5),
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(6),
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(7),
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(8) { grid-column: 1; }
-
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(1) { grid-row: 2 / span 2; }
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(2) { grid-row: 4 / span 2; }
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(3) { grid-row: 6 / span 2; }
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(4) { grid-row: 8 / span 2; }
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(5) { grid-row: 10 / span 2; }
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(6) { grid-row: 12 / span 2; }
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(7) { grid-row: 14 / span 2; }
-    #bracketView .poster-round-v5.dieciseisavos .poster-match-v5:nth-of-type(8) { grid-row: 16 / span 2; }
-
-    #bracketView .poster-round-v5.octavos .poster-match-v5:nth-of-type(1) { grid-row: 3 / span 2; }
-    #bracketView .poster-round-v5.octavos .poster-match-v5:nth-of-type(2) { grid-row: 7 / span 2; }
-    #bracketView .poster-round-v5.octavos .poster-match-v5:nth-of-type(3) { grid-row: 11 / span 2; }
-    #bracketView .poster-round-v5.octavos .poster-match-v5:nth-of-type(4) { grid-row: 15 / span 2; }
-
-    #bracketView .poster-round-v5.cuartos .poster-match-v5:nth-of-type(1) { grid-row: 5 / span 3; }
-    #bracketView .poster-round-v5.cuartos .poster-match-v5:nth-of-type(2) { grid-row: 13 / span 3; }
-
-    #bracketView .poster-round-v5.semifinales .poster-match-v5:nth-of-type(1) { grid-row: 9 / span 3; margin-top: 0 !important; }
-
-    /* Conectores */
-    #bracketView .bracket-side-v5 .poster-match-v5::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      width: 14px;
-      border-top: 2px solid rgba(255,255,255,.18);
-      transform: translateY(-50%);
-      pointer-events: none;
-    }
-    #bracketView .bracket-side-v5.left .poster-match-v5::after { right: -14px; }
-    #bracketView .bracket-side-v5.right .poster-match-v5::after { left: -14px; }
-
-    #bracketView .bracket-side-v5 .poster-match-v5::before {
-      content: "";
-      position: absolute;
-      width: 0;
-      border-right: 2px solid rgba(255,255,255,.14);
-      pointer-events: none;
-    }
-    #bracketView .bracket-side-v5.left .poster-match-v5:nth-of-type(odd)::before {
-      right: -14px; top: 50%; height: calc(100% + 10px);
-    }
-    #bracketView .bracket-side-v5.left .poster-match-v5:nth-of-type(even)::before {
-      right: -14px; bottom: 50%; height: calc(100% + 10px);
-    }
-    #bracketView .bracket-side-v5.right .poster-match-v5:nth-of-type(odd)::before {
-      left: -14px; top: 50%; height: calc(100% + 10px);
-    }
-    #bracketView .bracket-side-v5.right .poster-match-v5:nth-of-type(even)::before {
-      left: -14px; bottom: 50%; height: calc(100% + 10px);
-    }
-    /* Evitar conectores en rondas con 1 partido */
-    #bracketView .poster-round-v5.semifinales .poster-match-v5::before,
-    #bracketView .poster-round-v5.semifinales .poster-match-v5::after { opacity: .9; }
-
-    #bracketView .poster-center-v5 {
-      min-height: 800px !important;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 18px !important;
-      padding: 20px 6px 10px !important;
-      border-inline: 1px solid rgba(255,255,255,.12);
-      text-align: center;
-    }
-
-    #bracketView .poster-hero {
-      padding-top: 6px;
-      margin: 0;
-    }
-
-    #bracketView .poster-center-v5 h2 {
-      margin: 0 !important;
-      color: var(--yellow);
-      font-size: 54px !important;
-      line-height: .88 !important;
-      letter-spacing: .04em;
-      text-align: center;
-    }
-
-    #bracketView .center-final-card {
-      width: 100%;
-      max-width: 220px;
-      margin: 0 auto;
-      padding: 10px 10px 12px !important;
-      border-radius: 22px !important;
-    }
-    #bracketView .center-final-card h3,
-    #bracketView .third-place-mini h4 {
-      margin: 0 0 8px !important;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      text-align: center;
-    }
-    #bracketView .third-place-mini {
-      width: 100%;
-      max-width: 220px;
-      margin: 0 auto;
-    }
-    #bracketView .poster-bottom-trophy {
-      margin-top: auto !important;
-      padding-top: 8px;
-      margin-bottom: 8px !important;
-    }
-    #bracketView .poster-bottom-trophy .poster-trophy-wrap {
-      width: 130px !important;
-      height: 170px !important;
-      transform: none !important;
-      margin: 0 auto;
-    }
-
-    #bracketView .poster-groups {
-      width: 1500px !important;
-      min-width: 1500px !important;
-      margin: 18px auto 0 !important;
-      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-      gap: 14px !important;
-    }
-
-    #bracketView .poster-groups-title {
-      margin: 4px 0 0 !important;
-      font-size: 18px !important;
-    }
-
-    /* Móvil: mantenemos diseño profesional con scroll horizontal controlado */
-    @media (max-width: 900px) {
-      #bracketView .bracket-poster.v5 { padding: 14px 10px 20px !important; }
-      #bracketView .poster-board-v5 {
-        width: 1320px !important;
-        min-width: 1320px !important;
-        grid-template-columns: 490px 280px 490px !important;
-        gap: 24px !important;
-      }
-      #bracketView .poster-board-v5::before { left: calc(50% - 152px); }
-      #bracketView .poster-board-v5::after { right: calc(50% - 152px); }
-      #bracketView .bracket-side-v5.left { grid-template-columns: 154px 120px 102px 84px !important; }
-      #bracketView .bracket-side-v5.right { grid-template-columns: 84px 102px 120px 154px !important; }
-      #bracketView .poster-round-v5 { height: 760px !important; grid-template-rows: 30px repeat(16, 38px) !important; }
-      #bracketView .poster-center-v5 { min-height: 760px !important; }
-      #bracketView .poster-center-v5 h2 { font-size: 46px !important; }
-      #bracketView .center-final-card, #bracketView .third-place-mini { max-width: 205px; }
-      #bracketView .poster-groups { width: 1320px !important; min-width: 1320px !important; }
-    }
+    #bracketView .fifa-final-card > .fifa-match { position:relative !important; left:auto !important; top:auto !important; width:100% !important; min-height:58px !important; border:0 !important; border-radius:8px; box-shadow:none; }
+    #bracketView .fifa-third .fifa-match { position:relative !important; left:auto !important; top:auto !important; width:76px !important; min-height:47px !important; }
 
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -7325,94 +6830,112 @@
 
     function renderBracket() {
       const container = document.getElementById("bracketView");
-      const visibleMatches = state.matches.filter((match) => match.type === "knockout");
-      const hiddenCount = 0;
+      const allKnockout = state.matches.filter((m) => m.type === "knockout");
+      const stageMatches = (stage) => allKnockout.filter((m) => m.stage === stage).sort((a,b) => a.matchNo - b.matchNo);
+      const r32 = stageMatches("Dieciseisavos");
+      const r16 = stageMatches("Octavos");
+      const qf = stageMatches("Cuartos");
+      const sf = stageMatches("Semifinales");
+      const finalMatch = stageMatches("Final")[0];
+      const third = stageMatches("Tercer puesto")[0];
 
-      const stageHtml = (stage, side) => {
-        const all = visibleMatches.filter((match) => match.stage === stage).sort((a,b) => a.matchNo - b.matchNo);
-        const half = Math.ceil(all.length / 2);
-        const matches = side === "left" ? all.slice(0, half) : all.slice(half);
-        const slots = stage === "Dieciseisavos" ? 8 : stage === "Octavos" ? 4 : stage === "Cuartos" ? 2 : stage === "Semifinales" ? 1 : 0;
-        const missing = Math.max(0, slots - matches.length);
-        const stageClass = normalizeText(stage).replace(/\s+/g, "-");
-        return `
-          <div class="poster-round-v5 ${side} ${stageClass}">
-            <h3>${stage}</h3>
-            ${matches.map((match) => renderPosterMatchV5(match)).join("")}
-            ${Array.from({length: missing}).map(() => `<div class="poster-match-v5 hidden-ko">Por definir</div>`).join("")}
-          </div>
-        `;
+      const card = (match, cls = "") => {
+        if (!match) return `<div class="fifa-match is-empty ${cls}"><span class="fifa-placeholder">?</span></div>`;
+        const homeId = getResolvedTeamId(match, "home");
+        const awayId = getResolvedTeamId(match, "away");
+        const flag = (id) => id ? `<span class="fifa-flag">${renderMiniFlagImg(id, teamFlag(id), `Bandera de ${teamName(id)}`)}</span>` : `<span class="fifa-flag">?</span>`;
+        return `<div class="fifa-match ${cls}">
+          <div class="fifa-team-row">${flag(homeId)}<span class="fifa-score">${match.finished ? match.homeScore : ""}</span></div>
+          <div class="fifa-team-row">${flag(awayId)}<span class="fifa-score">${match.finished ? match.awayScore : ""}</span></div>
+          <div class="fifa-meta">${match.finished && match.winnerTeamId ? "Clasificado" : `P${match.matchNo}`}</div>
+        </div>`;
       };
 
-      const finalMatch = visibleMatches.find((match) => match.stage === "Final");
-      const thirdPlaceMatch = visibleMatches.find((match) => match.stage === "Tercer puesto");
+      const at = (html, left, top) => html.replace('class="fifa-match', `style="left:${left}px;top:${top}px" class="fifa-match`);
+      const first = (html, left, top) => html.replace('class="fifa-match', `style="left:${left}px;top:${top}px" class="fifa-match is-first`);
+      const leftR32Y = [88,166,244,322,400,478,556,634];
+      const leftR16Y = [127,283,439,595];
+      const leftQFY = [205,517];
+      const leftSFY = [361];
+      const rightR32Y = [88,166,244,322,400,478,556,634];
+      const rightR16Y = [127,283,439,595];
+      const rightQFY = [205,517];
+      const rightSFY = [361];
+
+      const leftCards = r32.slice(0,8).map((m,i)=>first(card(m),35,leftR32Y[i])).join("")
+        + r16.slice(0,4).map((m,i)=>at(card(m),172,leftR16Y[i])).join("")
+        + qf.slice(0,2).map((m,i)=>at(card(m),314,leftQFY[i])).join("")
+        + sf.slice(0,1).map((m,i)=>at(card(m),450,leftSFY[i])).join("");
+
+      const rightCards = sf.slice(1,2).map((m,i)=>at(card(m),834,rightSFY[i])).join("")
+        + qf.slice(2,4).map((m,i)=>at(card(m),934,rightQFY[i])).join("")
+        + r16.slice(4,8).map((m,i)=>at(card(m),1086,rightR16Y[i])).join("")
+        + r32.slice(8,16).map((m,i)=>first(card(m),1241,rightR32Y[i])).join("");
+
+      const connectorSvg = `
+        <svg class="fifa-svg" viewBox="0 0 1360 760" preserveAspectRatio="none" aria-hidden="true">
+          <!-- izquierdo: 1/16 a 1/8 -->
+          <path d="M119 114 H145 V153 H172"/><path d="M119 192 H145 V153 H172"/>
+          <path d="M119 270 H145 V309 H172"/><path d="M119 348 H145 V309 H172"/>
+          <path d="M119 426 H145 V465 H172"/><path d="M119 504 H145 V465 H172"/>
+          <path d="M119 582 H145 V621 H172"/><path d="M119 660 H145 V621 H172"/>
+          <!-- izquierdo: 1/8 a cuartos -->
+          <path d="M248 153 H280 V231 H314"/><path d="M248 309 H280 V231 H314"/>
+          <path d="M248 465 H280 V543 H314"/><path d="M248 621 H280 V543 H314"/>
+          <!-- izquierdo: cuartos a semis -->
+          <path d="M390 231 H420 V387 H450"/><path d="M390 543 H420 V387 H450"/>
+          <!-- hacia final --> <path d="M526 387 H572 V290 H610"/>
+          <!-- derecho: 1/16 a 1/8 -->
+          <path d="M1241 114 H1215 V153 H1162"/><path d="M1241 192 H1215 V153 H1162"/>
+          <path d="M1241 270 H1215 V309 H1162"/><path d="M1241 348 H1215 V309 H1162"/>
+          <path d="M1241 426 H1215 V465 H1162"/><path d="M1241 504 H1215 V465 H1162"/>
+          <path d="M1241 582 H1215 V621 H1162"/><path d="M1241 660 H1215 V621 H1162"/>
+          <!-- derecho: 1/8 a cuartos -->
+          <path d="M1086 153 H1058 V231 H1010"/><path d="M1086 309 H1058 V231 H1010"/>
+          <path d="M1086 465 H1058 V543 H1010"/><path d="M1086 621 H1058 V543 H1010"/>
+          <!-- derecho: cuartos a semis -->
+          <path d="M934 231 H904 V387 H910"/><path d="M934 543 H904 V387 H910"/>
+          <!-- hacia final --> <path d="M834 387 H788 V290 H750"/>
+          <!-- línea tercer puesto --> <path d="M644 455 H716"/>
+        </svg>`;
 
       container.innerHTML = `
-        ${hiddenCount ? `<div class="hidden-stage-note">${hiddenCount} cruces de eliminatoria pendientes.</div>` : ""}
         <div class="bracket-poster v5">
-          <div class="poster-board-v5">
-            <div class="bracket-side-v5 left">
-              ${stageHtml("Dieciseisavos", "left")}
-              ${stageHtml("Octavos", "left")}
-              ${stageHtml("Cuartos", "left")}
-              ${stageHtml("Semifinales", "left")}
-            </div>
-
-            <div class="poster-center-v5">
-              <div class="poster-hero">
-                <h2>WORLD CUP<br/>2026</h2>
-              </div>
-              <div class="center-final-card">
-                <h3>Final</h3>
-                ${finalMatch ? renderPosterMatchV5(finalMatch) : `<div class="poster-match-v5 hidden-ko">Final por definir</div>`}
-                <p class="muted" style="color:rgba(255,255,255,.72);margin-top:8px;">${getOfficialChampionTeamId() ? `Campeón: ${teamName(getOfficialChampionTeamId())}` : "Campeón por definir"}</p>
-              </div>
-              <div class="third-place-mini">
-                <h4>Tercer puesto</h4>
-                ${thirdPlaceMatch ? renderPosterMatchV5(thirdPlaceMatch) : `<div class="poster-match-v5 hidden-ko">Tercer puesto por definir</div>`}
-              </div>
-              <div class="poster-bottom-trophy">
-                <div class="poster-trophy-wrap">${renderWorldCupTrophySvg()}</div>
-              </div>
-            </div>
-
-            <div class="bracket-side-v5 right">
-              ${stageHtml("Semifinales", "right")}
-              ${stageHtml("Cuartos", "right")}
-              ${stageHtml("Octavos", "right")}
-              ${stageHtml("Dieciseisavos", "right")}
-            </div>
+          <div class="fifa-bracket-board">
+            ${connectorSvg}
+            <div class="fifa-stage-label left" style="left:35px;top:57px">1/16</div>
+            <div class="fifa-stage-label left" style="left:177px;top:57px">1/8</div>
+            <div class="fifa-stage-label left" style="left:318px;top:57px">Cuartos</div>
+            <div class="fifa-stage-label left" style="left:453px;top:57px">Semis</div>
+            <div class="fifa-stage-label right" style="right:453px;top:57px">Semis</div>
+            <div class="fifa-stage-label right" style="right:318px;top:57px">Cuartos</div>
+            <div class="fifa-stage-label right" style="right:177px;top:57px">1/8</div>
+            <div class="fifa-stage-label right" style="right:35px;top:57px">1/16</div>
+            <div class="fifa-title"><h2>WORLD CUP<br/>2026</h2><p>Canadá · México · USA</p></div>
+            ${leftCards}${rightCards}
+            <div class="fifa-final-zone"><h3>Final</h3><div class="fifa-final-card">${finalMatch ? card(finalMatch).replace('class="fifa-match', 'class="fifa-match').replace('style="', 'style="') : ''}</div><p class="fifa-final-caption">Campeón</p></div>
+            <div class="fifa-third"><h4>3er y 4º puesto</h4><div class="fifa-third-cards">${third ? card(third) : card(null)}${card(null)}</div></div>
+            <div class="fifa-trophy"><div class="poster-trophy-wrap">${renderWorldCupTrophySvg()}</div></div>
           </div>
           <div class="poster-groups">
             <div class="poster-groups-title">GROUPS</div>
             ${GROUPS.map((group) => {
               const rows = getGroupStandings(group);
-              return `<div class="poster-group-card">
-                <h4>${group}</h4>
-                <div class="poster-group-table">
-                  <div class="poster-group-head"><span>#</span><span>Selección</span><span>PTS</span></div>
-                  ${rows.map((row, idx) => `<div class="poster-group-row ${idx < 2 ? "qualified" : ""}"><span>${idx + 1}</span><span>${renderMiniTeam(row.teamId)}</span><strong>${row.points}</strong></div>`).join("")}
-                </div>
-              </div>`;
+              return `<div class="poster-group-card"><h4>${group}</h4><div class="poster-group-table"><div class="poster-group-head"><span>#</span><span>Selección</span><span>PTS</span></div>${rows.map((row, idx) => `<div class="poster-group-row ${idx < 2 ? "qualified" : ""}"><span>${idx + 1}</span><span>${renderMiniTeam(row.teamId)}</span><strong>${row.points}</strong></div>`).join("")}</div></div>`;
             }).join("")}
           </div>
-        </div>
-      `;
+        </div>`;
     }
 
     function renderPosterMatchV5(match) {
       const homeId = getResolvedTeamId(match, "home");
       const awayId = getResolvedTeamId(match, "away");
-      const homeLabel = homeId
-        ? `<span class="bracket-flag-only">${renderMiniFlagImg(homeId, teamFlag(homeId), `Bandera de ${teamName(homeId)}`)}</span>`
-        : `<span class="bracket-flag-only placeholder">?</span>`;
-      const awayLabel = awayId
-        ? `<span class="bracket-flag-only">${renderMiniFlagImg(awayId, teamFlag(awayId), `Bandera de ${teamName(awayId)}`)}</span>`
-        : `<span class="bracket-flag-only placeholder">?</span>`;
+      const homeLabel = homeId ? renderMiniTeam(homeId) : `<span class="mini-team slot-placeholder">Por definir</span>`;
+      const awayLabel = awayId ? renderMiniTeam(awayId) : `<span class="mini-team slot-placeholder">Por definir</span>`;
       return `
         <div class="poster-match-v5">
-          <div class="poster-team-v5"><span class="team-slot">${homeLabel}</span><strong>${match.finished ? match.homeScore : ""}</strong></div>
-          <div class="poster-team-v5"><span class="team-slot">${awayLabel}</span><strong>${match.finished ? match.awayScore : ""}</strong></div>
+          <div class="poster-team-v5"><span>${homeLabel}</span><strong>${match.finished ? match.homeScore : ""}</strong></div>
+          <div class="poster-team-v5"><span>${awayLabel}</span><strong>${match.finished ? match.awayScore : ""}</strong></div>
           ${match.finished && match.winnerTeamId ? `<small>Avanza: ${teamName(match.winnerTeamId)}</small>` : `<small>Partido ${match.matchNo} · ${formatDate(match.matchDate)}</small>`}
         </div>
       `;
