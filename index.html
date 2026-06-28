@@ -2581,6 +2581,800 @@
       #bracketView .fifa-trophy .poster-trophy-wrap{ width:72px !important; height:100px !important; }
     }
 
+  
+
+    /* v52 · restauración exacta de la pestaña Fase final de v40 */
+    /* Fase 1 v5 · bracket completo, copa al centro */
+    .bracket-poster.v5 {
+      background:
+        radial-gradient(circle at center 72%, rgba(255,212,0,.12), transparent 22%),
+        linear-gradient(180deg, #0b2f62 0%, #0a2953 55%, #082347 100%);
+      border-radius: 28px;
+      padding: clamp(16px, 2vw, 24px);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.16);
+      overflow-x: auto;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 18px 45px rgba(0,0,0,.24);
+    }
+
+    .poster-board-v5 {
+      min-width: 1060px;
+      display: grid;
+      grid-template-columns: minmax(390px, 1fr) minmax(230px, .55fr) minmax(390px, 1fr);
+      gap: 16px;
+      align-items: stretch;
+      position: relative;
+    }
+
+    .poster-board-v5::before,
+    .poster-board-v5::after {
+      content: "";
+      position: absolute;
+      top: 10px;
+      bottom: 10px;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, rgba(255,255,255,.18) 8%, rgba(255,255,255,.18) 92%, transparent);
+      pointer-events: none;
+    }
+
+    .poster-board-v5::before {
+      left: calc(50% - 76px);
+    }
+
+    .poster-board-v5::after {
+      right: calc(50% - 76px);
+    }
+
+    .bracket-side-v5 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(86px, 1fr));
+      gap: 9px;
+      align-items: center;
+    }
+
+    .poster-round-v5 {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+      min-width: 0;
+      position: relative;
+    }
+
+    .poster-round-v5 h3 {
+      color: var(--yellow);
+      font-size: 10px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 3px;
+      white-space: nowrap;
+    }
+
+    .poster-match-v5 {
+      position: relative;
+      border: 1px solid rgba(255,255,255,.18);
+      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
+      border-radius: 12px;
+      padding: 7px 8px;
+      min-height: 58px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 4px 10px rgba(0,0,0,.12);
+    }
+
+    .poster-match-v5.hidden-ko {
+      opacity: .58;
+      border-style: dashed;
+      background: rgba(0,0,0,.22);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .poster-team-v5 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+      font-size: 10.5px;
+      padding: 2px 0;
+      min-width: 0;
+    }
+
+    .poster-team-v5 span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+    }
+
+    .poster-team-v5 .mini-team {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .poster-team-v5 .mini-team img {
+      flex: 0 0 auto;
+    }
+
+    .poster-team-v5 .slot-placeholder {
+      color: rgba(255,255,255,.65);
+      font-style: italic;
+    }
+
+    .poster-team-v5 strong {
+      flex: 0 0 auto;
+      color: var(--yellow);
+    }
+
+    .poster-match-v5 small {
+      display: block;
+      margin-top: 3px;
+      color: rgba(255,255,255,.65);
+      font-size: 9px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .poster-center-v5 {
+      min-height: 650px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 12px;
+      border-inline: 1px solid rgba(255,255,255,.12);
+      padding-inline: 10px;
+    }
+
+    .poster-center-v5 h2 {
+      color: var(--yellow);
+      font-size: 25px;
+      line-height: .95;
+      letter-spacing: .04em;
+    }
+
+    .poster-trophy-wrap {
+      width: 138px;
+      height: 172px;
+      display: grid;
+      place-items: center;
+      filter: drop-shadow(0 18px 18px rgba(0,0,0,.42));
+    }
+
+    .world-cup-trophy-svg {
+      width: 128px;
+      height: 160px;
+      display: block;
+    }
+
+    .center-final-card {
+      width: 100%;
+      border: 1px solid rgba(255,212,0,.46);
+      background: linear-gradient(180deg, rgba(8,33,71,.82), rgba(7,25,53,.92));
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: 0 8px 18px rgba(0,0,0,.15), inset 0 0 0 1px rgba(255,255,255,.03);
+    }
+
+    .center-final-card h3 {
+      color: var(--yellow);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      margin-bottom: 6px;
+    }
+
+    .center-final-card .poster-match-v5 {
+      background: rgba(255,212,0,.11);
+      border-color: rgba(255,212,0,.38);
+    }
+
+    .third-place-mini {
+      width: 100%;
+      opacity: .92;
+    }
+
+    .third-place-mini h4 {
+      font-size: 11px;
+      color: rgba(255,255,255,.7);
+      margin: 6px 0;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    @media (max-width: 1180px) {
+      .poster-board-v5 { min-width: 1000px; }
+      .poster-center-v5 { min-height: 610px; }
+      .poster-match-v5 { min-height: 49px; padding: 5px; }
+      .poster-team-v5 { font-size: 10px; }
+    }
+
+
+
+    /* Fase 1 v6 · Bracket a ancho completo sin scroll horizontal */
+    #bracketView.bracket {
+      display: block;
+      grid-template-columns: none;
+      gap: 0;
+      overflow-x: visible;
+      padding-bottom: 0;
+      width: 100%;
+    }
+
+    #bracketView .bracket-poster.v5 {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: visible;
+      padding: clamp(10px, 1.5vw, 18px);
+    }
+
+    #bracketView .poster-board-v5 {
+      width: 100%;
+      min-width: 0;
+      grid-template-columns: minmax(0, 1fr) minmax(215px, 0.44fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    #bracketView .bracket-side-v5 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      min-width: 0;
+      align-items: stretch;
+    }
+
+    #bracketView .poster-round-v5 {
+      gap: 12px;
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+
+    #bracketView .poster-round-v5 h3 {
+      font-size: clamp(8px, .7vw, 11px);
+      letter-spacing: .08em;
+      margin-bottom: 2px;
+    }
+
+    #bracketView .poster-match-v5 {
+      min-height: 60px;
+      padding: 7px 8px;
+      border-radius: 12px;
+    }
+
+    #bracketView .poster-match-v5.hidden-ko {
+      font-size: clamp(7px, .58vw, 10px);
+      line-height: 1.12;
+      padding: 4px 3px;
+    }
+
+    #bracketView .poster-team-v5 {
+      font-size: clamp(8.2px, .68vw, 11.2px);
+      gap: 6px;
+      padding: 2px 0;
+    }
+
+    #bracketView .poster-match-v5 small {
+      font-size: clamp(7px, .56vw, 9px);
+      margin-top: 4px;
+      color: rgba(255,255,255,.68);
+    }
+
+    #bracketView .poster-center-v5 {
+      min-height: auto;
+      padding-inline: 12px;
+      gap: 12px;
+      justify-content: flex-start;
+      padding-top: 18px;
+    }
+
+    #bracketView .poster-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 6px;
+      margin-bottom: 6px;
+      padding-top: 4px;
+    }
+
+    #bracketView .poster-bottom-trophy {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 16px;
+      margin-bottom: 26px;
+    }
+
+    #bracketView .poster-bottom-trophy .poster-trophy-wrap {
+      width: clamp(54px, 5.2vw, 84px);
+      height: clamp(82px, 7.8vw, 126px);
+      margin-bottom: 0;
+      transform: none;
+    }
+
+    #bracketView .poster-center-v5 h2 {
+      font-size: clamp(18px, 1.7vw, 28px);
+      line-height: 0.95;
+      letter-spacing: .06em;
+      color: var(--yellow);
+      text-align: center;
+      margin: 0 0 2px;
+      position: relative;
+      z-index: 2;
+    }
+
+    #bracketView .poster-trophy-wrap {
+      width: clamp(65px, 6.5vw, 105px);
+      height: clamp(95px, 9.5vw, 155px);
+      margin-bottom: 12px;
+      transform: translateY(-14px);
+      overflow: visible;
+      position: relative;
+      z-index: 1;
+    }
+
+    #bracketView .world-cup-trophy-svg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center top;
+      display: block;
+    }
+
+    #bracketView .bracket-side-v5.left .poster-match-v5::after,
+    #bracketView .bracket-side-v5.right .poster-match-v5::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 12px;
+      border-top: 2px solid rgba(255,255,255,.18);
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    #bracketView .bracket-side-v5.left .poster-match-v5::after {
+      right: -12px;
+    }
+
+    #bracketView .bracket-side-v5.right .poster-match-v5::after {
+      left: -12px;
+    }
+
+    #bracketView .bracket-side-v5.left .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(odd)::before,
+    #bracketView .bracket-side-v5.left .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(even)::before,
+    #bracketView .bracket-side-v5.right .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(odd)::before,
+    #bracketView .bracket-side-v5.right .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(even)::before {
+      content: "";
+      position: absolute;
+      width: 0;
+      border-right: 2px solid rgba(255,255,255,.14);
+      pointer-events: none;
+    }
+
+    #bracketView .bracket-side-v5.left .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(odd)::before {
+      right: -12px;
+      top: 50%;
+      height: calc(100% + 12px);
+    }
+
+    #bracketView .bracket-side-v5.left .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(even)::before {
+      right: -12px;
+      bottom: 50%;
+      height: calc(100% + 12px);
+    }
+
+    #bracketView .bracket-side-v5.right .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(odd)::before {
+      left: -12px;
+      top: 50%;
+      height: calc(100% + 12px);
+    }
+
+    #bracketView .bracket-side-v5.right .poster-round-v5:not(.semifinales) .poster-match-v5:nth-of-type(even)::before {
+      left: -12px;
+      bottom: 50%;
+      height: calc(100% + 12px);
+    }
+
+    #bracketView .poster-round-v5.semifinales .poster-match-v5 {
+      margin-top: 62px;
+    }
+
+    #bracketView .poster-round-v5.cuartos .poster-match-v5:nth-of-type(1),
+    #bracketView .poster-round-v5.cuartos .poster-match-v5:nth-of-type(2) {
+      margin-bottom: 18px;
+    }
+
+    #bracketView .poster-round-v5.octavos .poster-match-v5:nth-of-type(2),
+    #bracketView .poster-round-v5.octavos .poster-match-v5:nth-of-type(4) {
+      margin-bottom: 14px;
+    }
+
+    #bracketView .center-final-card,
+    #bracketView .third-place-mini {
+      max-width: 100%;
+    }
+
+    #bracketView .poster-groups {
+      min-width: 0;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+      align-items: stretch;
+    }
+
+    #bracketView .poster-groups-title {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: var(--yellow);
+      font-weight: 900;
+      letter-spacing: .12em;
+      font-size: clamp(16px, 1vw, 22px);
+      margin-bottom: 2px;
+    }
+
+    #bracketView .poster-group-card {
+      padding: 8px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 142px;
+    }
+
+    #bracketView .poster-group-card h4 {
+      font-size: clamp(11px, .8vw, 13px);
+      margin-bottom: 2px;
+      text-align: center;
+    }
+
+    #bracketView .poster-group-table {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #bracketView .poster-group-head,
+    #bracketView .poster-group-row {
+      display: grid;
+      grid-template-columns: 18px minmax(0, 1fr) 34px;
+      gap: 6px;
+      align-items: center;
+      font-size: 11px;
+    }
+
+    #bracketView .poster-group-head {
+      color: rgba(255,255,255,.72);
+      font-weight: 700;
+      padding: 0 2px 3px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+    }
+
+    #bracketView .poster-group-row {
+      padding: 4px 6px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.04);
+    }
+
+    #bracketView .poster-group-row.qualified {
+      background: rgba(255,214,0,.12);
+      border: 1px solid rgba(255,214,0,.28);
+    }
+
+    #bracketView .poster-group-row span,
+    #bracketView .poster-group-row strong {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #bracketView .poster-group-row strong {
+      text-align: right;
+      color: var(--yellow);
+    }
+
+    #bracketView .poster-group-row .mini-team {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    @media (max-width: 980px) {
+      #bracketView .poster-board-v5 {
+        grid-template-columns: 1fr;
+      }
+
+      #bracketView .poster-center-v5 {
+        order: -1;
+        border-inline: 0;
+        border-bottom: 1px solid rgba(255,255,255,.14);
+        padding-bottom: 14px;
+      }
+
+      #bracketView .poster-groups {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      #bracketView .poster-groups {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+
+    /* v39 · navegación rápida de predicciones */
+    .prediction-quick-toolbar {
+      position: sticky;
+      top: 10px;
+      z-index: 50;
+      margin-bottom: 18px;
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(0,0,0,.10);
+      box-shadow: 0 14px 28px rgba(0,0,0,.14);
+      backdrop-filter: blur(10px);
+    }
+
+    .prediction-quick-toolbar h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .prediction-quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .prediction-quick-actions button {
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: #111;
+      color: var(--yellow);
+      border: 1px solid rgba(255,212,0,.35);
+      font-size: 13px;
+    }
+
+    .prediction-quick-actions button:hover {
+      border-color: var(--yellow);
+    }
+
+    .prediction-quick-actions select {
+      min-width: min(280px, 100%);
+      flex: 1 1 240px;
+      border-radius: 999px;
+      font-weight: 800;
+    }
+
+    .prediction-count-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 680px) {
+      .prediction-quick-toolbar {
+        top: 6px;
+        padding: 12px;
+      }
+
+      .prediction-quick-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .prediction-quick-actions select,
+      .prediction-count-pill {
+        grid-column: 1 / -1;
+      }
+    }
+
+
+    .home-layout-with-ads {
+      display: grid;
+      grid-template-columns: minmax(170px, 220px) minmax(0, 1fr) minmax(170px, 220px);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .home-content {
+      min-width: 0;
+    }
+
+    .shop-ad-card {
+      position: relative;
+      top: auto;
+      height: 100%;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px;
+      border-radius: 24px;
+      color: #fff;
+      text-decoration: none;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top right, rgba(255,212,0,.36), transparent 34%),
+        linear-gradient(160deg, #050505 0%, #151515 62%, #ffd400 62%, #ffe768 100%);
+      border: 1px solid rgba(255,212,0,.45);
+      box-shadow: 0 18px 34px rgba(0,0,0,.28);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+
+    .shop-ad-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 22px 42px rgba(0,0,0,.36);
+      border-color: rgba(255,212,0,.82);
+    }
+
+    .shop-ad-card::after {
+      content: "";
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      right: -52px;
+      bottom: -52px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.22);
+      pointer-events: none;
+    }
+
+    .shop-ad-kicker {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,212,0,.14);
+      border: 1px solid rgba(255,212,0,.34);
+      color: var(--yellow);
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .shop-ad-card strong {
+      display: block;
+      color: #fff;
+      font-size: clamp(22px, 2.2vw, 32px);
+      line-height: 1.05;
+      max-width: 190px;
+    }
+
+    .shop-ad-card span:not(.shop-ad-kicker):not(.shop-ad-cta) {
+      display: block;
+      color: rgba(255,255,255,.82);
+      font-size: 14px;
+      line-height: 1.45;
+      max-width: 190px;
+    }
+
+    .shop-ad-cta {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      padding: 10px 13px;
+      border-radius: 999px;
+      background: #050505;
+      color: var(--yellow);
+      border: 1px solid rgba(255,212,0,.4);
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    @media (max-width: 1120px) {
+      .home-layout-with-ads {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .home-content {
+        order: 1;
+      }
+
+      .shop-ad-card.primary {
+        order: 2;
+      }
+
+      .shop-ad-card.secondary {
+        order: 3;
+        display: flex;
+      }
+
+      .shop-ad-card {
+        position: static;
+        height: auto;
+        min-height: 155px;
+        flex-direction: row;
+        align-items: flex-end;
+        padding: 18px;
+        background:
+          radial-gradient(circle at bottom right, rgba(255,255,255,.26), transparent 28%),
+          linear-gradient(135deg, #050505 0%, #151515 64%, #ffd400 64%, #ffe768 100%);
+      }
+
+      .shop-ad-card strong,
+      .shop-ad-card span:not(.shop-ad-kicker):not(.shop-ad-cta) {
+        max-width: 520px;
+      }
+
+      .shop-ad-card strong {
+        font-size: clamp(24px, 5vw, 34px);
+      }
+
+      .shop-ad-card span:not(.shop-ad-kicker):not(.shop-ad-cta) {
+        font-size: 14px;
+      }
+
+      .shop-ad-card::after {
+        width: 120px;
+        height: 120px;
+        right: -42px;
+        bottom: -42px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .home-layout-with-ads {
+        gap: 14px;
+      }
+
+      .shop-ad-card {
+        min-height: 142px;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 16px;
+        border-radius: 20px;
+      }
+
+      .shop-ad-kicker {
+        font-size: 10px;
+        padding: 5px 9px;
+      }
+
+      .shop-ad-card strong {
+        font-size: 24px;
+        max-width: 250px;
+      }
+
+      .shop-ad-card span:not(.shop-ad-kicker):not(.shop-ad-cta) {
+        font-size: 13px;
+        max-width: 280px;
+      }
+
+      .shop-ad-cta {
+        padding: 9px 12px;
+        font-size: 12px;
+      }
+    }
+
+
+
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -6911,93 +7705,79 @@
 
     function renderBracket() {
       const container = document.getElementById("bracketView");
-      const allKnockout = state.matches.filter((m) => m.type === "knockout");
-      const stageMatches = (stage) => allKnockout.filter((m) => m.stage === stage).sort((a,b) => a.matchNo - b.matchNo);
-      const r32 = stageMatches("Dieciseisavos");
-      const r16 = stageMatches("Octavos");
-      const qf = stageMatches("Cuartos");
-      const sf = stageMatches("Semifinales");
-      const finalMatch = stageMatches("Final")[0];
-      const third = stageMatches("Tercer puesto")[0];
+      const visibleMatches = state.matches.filter((match) => match.type === "knockout");
+      const hiddenCount = 0;
 
-      const card = (match, cls = "") => {
-        if (!match) return `<div class="fifa-match is-empty ${cls}"><span class="fifa-placeholder">?</span></div>`;
-        const homeId = getResolvedTeamId(match, "home");
-        const awayId = getResolvedTeamId(match, "away");
-        const flag = (id) => id ? `<span class="fifa-flag">${renderMiniFlagImg(id, teamFlag(id), `Bandera de ${teamName(id)}`)}</span>` : `<span class="fifa-flag">?</span>`;
-        return `<div class="fifa-match ${cls}">
-          <div class="fifa-team-row">${flag(homeId)}<span class="fifa-score">${match.finished ? match.homeScore : ""}</span></div>
-          <div class="fifa-team-row">${flag(awayId)}<span class="fifa-score">${match.finished ? match.awayScore : ""}</span></div>
-          <div class="fifa-meta">P${match.matchNo}</div>
-        </div>`;
+      const stageHtml = (stage, side) => {
+        const all = visibleMatches.filter((match) => match.stage === stage).sort((a,b) => a.matchNo - b.matchNo);
+        const half = Math.ceil(all.length / 2);
+        const matches = side === "left" ? all.slice(0, half) : all.slice(half);
+        const slots = stage === "Dieciseisavos" ? 8 : stage === "Octavos" ? 4 : stage === "Cuartos" ? 2 : stage === "Semifinales" ? 1 : 0;
+        const missing = Math.max(0, slots - matches.length);
+        const stageClass = normalizeText(stage).replace(/\s+/g, "-");
+        return `
+          <div class="poster-round-v5 ${side} ${stageClass}">
+            <h3>${stage}</h3>
+            ${matches.map((match) => renderPosterMatchV5(match)).join("")}
+            ${Array.from({length: missing}).map(() => `<div class="poster-match-v5 hidden-ko">Por definir</div>`).join("")}
+          </div>
+        `;
       };
 
-      const at = (html, left, top) => html.replace('class="fifa-match', `style="left:${left}px;top:${top}px" class="fifa-match`);
-      const first = (html, left, top) => html.replace('class="fifa-match', `style="left:${left}px;top:${top}px" class="fifa-match is-first`);
-      const leftR32Y = [88,166,244,322,400,478,556,634];
-      const leftR16Y = [127,283,439,595];
-      const leftQFY = [205,517];
-      const leftSFY = [361];
-      const rightR32Y = [88,166,244,322,400,478,556,634];
-      const rightR16Y = [127,283,439,595];
-      const rightQFY = [205,517];
-      const rightSFY = [361];
-
-      const leftCards = r32.slice(0,8).map((m,i)=>first(card(m),35,leftR32Y[i])).join("")
-        + r16.slice(0,4).map((m,i)=>at(card(m),172,leftR16Y[i])).join("")
-        + qf.slice(0,2).map((m,i)=>at(card(m),314,leftQFY[i])).join("")
-        + sf.slice(0,1).map((m,i)=>at(card(m),450,leftSFY[i])).join("");
-
-      const rightCards = sf.slice(1,2).map((m,i)=>at(card(m),834,rightSFY[i])).join("")
-        + qf.slice(2,4).map((m,i)=>at(card(m),934,rightQFY[i])).join("")
-        + r16.slice(4,8).map((m,i)=>at(card(m),1086,rightR16Y[i])).join("")
-        + r32.slice(8,16).map((m,i)=>first(card(m),1241,rightR32Y[i])).join("");
-
-      const connectorSvg = `
-        <svg class="fifa-svg" viewBox="0 0 1360 760" preserveAspectRatio="none" aria-hidden="true">
-          <!-- izquierdo: 1/16 a 1/8 -->
-          <path d="M119 114 H145 V153 H172"/><path d="M119 192 H145 V153 H172"/>
-          <path d="M119 270 H145 V309 H172"/><path d="M119 348 H145 V309 H172"/>
-          <path d="M119 426 H145 V465 H172"/><path d="M119 504 H145 V465 H172"/>
-          <path d="M119 582 H145 V621 H172"/><path d="M119 660 H145 V621 H172"/>
-          <!-- izquierdo: 1/8 a cuartos -->
-          <path d="M248 153 H280 V231 H314"/><path d="M248 309 H280 V231 H314"/>
-          <path d="M248 465 H280 V543 H314"/><path d="M248 621 H280 V543 H314"/>
-          <!-- izquierdo: cuartos a semis -->
-          <path d="M390 231 H420 V387 H450"/><path d="M390 543 H420 V387 H450"/>
-          <!-- hacia final --> <path d="M526 387 H572 V290 H610"/>
-          <!-- derecho: 1/16 a 1/8 -->
-          <path d="M1241 114 H1215 V153 H1162"/><path d="M1241 192 H1215 V153 H1162"/>
-          <path d="M1241 270 H1215 V309 H1162"/><path d="M1241 348 H1215 V309 H1162"/>
-          <path d="M1241 426 H1215 V465 H1162"/><path d="M1241 504 H1215 V465 H1162"/>
-          <path d="M1241 582 H1215 V621 H1162"/><path d="M1241 660 H1215 V621 H1162"/>
-          <!-- derecho: 1/8 a cuartos -->
-          <path d="M1086 153 H1058 V231 H1010"/><path d="M1086 309 H1058 V231 H1010"/>
-          <path d="M1086 465 H1058 V543 H1010"/><path d="M1086 621 H1058 V543 H1010"/>
-          <!-- derecho: cuartos a semis -->
-          <path d="M934 231 H904 V387 H910"/><path d="M934 543 H904 V387 H910"/>
-          <!-- hacia final --> <path d="M834 387 H788 V290 H750"/>
-          <!-- línea tercer puesto --> <path d="M644 455 H716"/>
-        </svg>`;
+      const finalMatch = visibleMatches.find((match) => match.stage === "Final");
+      const thirdPlaceMatch = visibleMatches.find((match) => match.stage === "Tercer puesto");
 
       container.innerHTML = `
+        ${hiddenCount ? `<div class="hidden-stage-note">${hiddenCount} cruces de eliminatoria pendientes.</div>` : ""}
         <div class="bracket-poster v5">
-          <div class="fifa-bracket-board">
-            ${connectorSvg}
-            <div class="fifa-title"><h2>WORLD CUP<br/>2026</h2><p>Canadá · México · USA</p></div>
-            ${leftCards}${rightCards}
-            <div class="fifa-final-zone"><h3>Final</h3><div class="fifa-final-card">${finalMatch ? card(finalMatch).replace('class="fifa-match', 'class="fifa-match').replace('style="', 'style="') : ''}</div><p class="fifa-final-caption">Campeón</p></div>
-            <div class="fifa-third"><h4>3er y 4º puesto</h4><div class="fifa-third-cards">${third ? card(third) : card(null)}${card(null)}</div></div>
-            <div class="fifa-trophy"><div class="poster-trophy-wrap">${renderWorldCupTrophySvg()}</div></div>
+          <div class="poster-board-v5">
+            <div class="bracket-side-v5 left">
+              ${stageHtml("Dieciseisavos", "left")}
+              ${stageHtml("Octavos", "left")}
+              ${stageHtml("Cuartos", "left")}
+              ${stageHtml("Semifinales", "left")}
+            </div>
+
+            <div class="poster-center-v5">
+              <div class="poster-hero">
+                <h2>WORLD CUP<br/>2026</h2>
+              </div>
+              <div class="center-final-card">
+                <h3>Final</h3>
+                ${finalMatch ? renderPosterMatchV5(finalMatch) : `<div class="poster-match-v5 hidden-ko">Final por definir</div>`}
+                <p class="muted" style="color:rgba(255,255,255,.72);margin-top:8px;">${getOfficialChampionTeamId() ? `Campeón: ${teamName(getOfficialChampionTeamId())}` : "Campeón por definir"}</p>
+              </div>
+              <div class="third-place-mini">
+                <h4>Tercer puesto</h4>
+                ${thirdPlaceMatch ? renderPosterMatchV5(thirdPlaceMatch) : `<div class="poster-match-v5 hidden-ko">Tercer puesto por definir</div>`}
+              </div>
+              <div class="poster-bottom-trophy">
+                <div class="poster-trophy-wrap">${renderWorldCupTrophySvg()}</div>
+              </div>
+            </div>
+
+            <div class="bracket-side-v5 right">
+              ${stageHtml("Semifinales", "right")}
+              ${stageHtml("Cuartos", "right")}
+              ${stageHtml("Octavos", "right")}
+              ${stageHtml("Dieciseisavos", "right")}
+            </div>
           </div>
           <div class="poster-groups">
             <div class="poster-groups-title">GROUPS</div>
             ${GROUPS.map((group) => {
               const rows = getGroupStandings(group);
-              return `<div class="poster-group-card"><h4>${group}</h4><div class="poster-group-table"><div class="poster-group-head"><span>#</span><span>Selección</span><span>PTS</span></div>${rows.map((row, idx) => `<div class="poster-group-row ${idx < 2 ? "qualified" : ""}"><span>${idx + 1}</span><span>${renderMiniTeam(row.teamId)}</span><strong>${row.points}</strong></div>`).join("")}</div></div>`;
+              return `<div class="poster-group-card">
+                <h4>${group}</h4>
+                <div class="poster-group-table">
+                  <div class="poster-group-head"><span>#</span><span>Selección</span><span>PTS</span></div>
+                  ${rows.map((row, idx) => `<div class="poster-group-row ${idx < 2 ? "qualified" : ""}"><span>${idx + 1}</span><span>${renderMiniTeam(row.teamId)}</span><strong>${row.points}</strong></div>`).join("")}
+                </div>
+              </div>`;
             }).join("")}
           </div>
-        </div>`;
+        </div>
+      `;
     }
 
     function renderPosterMatchV5(match) {
