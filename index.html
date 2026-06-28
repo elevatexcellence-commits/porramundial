@@ -2020,6 +2020,109 @@
 
 
 
+
+
+    /* v41 · ajustes profesionales de bracket y eliminación sin ocultar cruces */
+    #bracketView .bracket-poster.v5 {
+      max-width: 1440px;
+      margin: 0 auto;
+      overflow-x: auto;
+      padding: 18px;
+    }
+    #bracketView .poster-board-v5 {
+      min-width: 1320px;
+      width: 100%;
+      grid-template-columns: minmax(460px, 1fr) minmax(280px, .62fr) minmax(460px, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+    #bracketView .poster-board-v5::before { left: calc(50% - 145px); }
+    #bracketView .poster-board-v5::after { right: calc(50% - 145px); }
+    #bracketView .bracket-side-v5 {
+      grid-template-columns: 1.45fr 1.15fr 1fr .9fr;
+      gap: 18px;
+      align-items: start;
+    }
+    #bracketView .poster-round-v5 {
+      height: 760px;
+      justify-content: space-around;
+      gap: 12px;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    #bracketView .poster-round-v5 h3 {
+      font-size: 12px;
+      letter-spacing: .09em;
+      margin: 0 0 8px;
+    }
+    #bracketView .poster-match-v5 {
+      min-height: 72px;
+      padding: 8px 10px;
+      border-radius: 14px;
+    }
+    #bracketView .poster-team-v5 {
+      font-size: 12px;
+      gap: 8px;
+    }
+    #bracketView .poster-match-v5 small {
+      font-size: 9.5px;
+      margin-top: 5px;
+    }
+    #bracketView .poster-round-v5.octavos .poster-match-v5,
+    #bracketView .poster-round-v5.cuartos .poster-match-v5,
+    #bracketView .poster-round-v5.semifinales .poster-match-v5 {
+      margin: 0 !important;
+    }
+    #bracketView .poster-round-v5.semifinales { justify-content: center; }
+    #bracketView .poster-round-v5.cuartos { justify-content: space-evenly; }
+    #bracketView .poster-round-v5.octavos { justify-content: space-around; }
+    #bracketView .poster-round-v5.dieciseisavos { justify-content: space-between; }
+    #bracketView .poster-center-v5 {
+      min-height: 760px;
+      justify-content: center;
+      gap: 18px;
+      padding-inline: 16px;
+      padding-top: 0;
+    }
+    #bracketView .poster-hero {
+      margin-bottom: 0;
+      padding-top: 0;
+      gap: 4px;
+    }
+    #bracketView .poster-center-v5 h2 {
+      font-size: 44px;
+      line-height: .9;
+      letter-spacing: .05em;
+      margin: 0;
+    }
+    #bracketView .center-final-card {
+      max-width: 260px;
+      margin: 0 auto;
+    }
+    #bracketView .third-place-mini {
+      max-width: 240px;
+      margin: 0 auto;
+    }
+    #bracketView .poster-bottom-trophy {
+      margin-top: 8px;
+      margin-bottom: 0;
+    }
+    #bracketView .poster-bottom-trophy .poster-trophy-wrap,
+    #bracketView .poster-trophy-wrap {
+      width: 110px;
+      height: 150px;
+      transform: none;
+      margin-bottom: 0;
+    }
+    #bracketView .world-cup-trophy-svg {
+      width: 100%;
+      height: 100%;
+    }
+    @media (max-width: 1200px) {
+      #bracketView .bracket-poster.v5 { overflow-x: auto; }
+      #bracketView .poster-board-v5 { min-width: 1240px; }
+    }
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -2193,21 +2296,6 @@
 
         <div id="bonusPredictionBox"></div>
 
-        <div class="prediction-quick-toolbar">
-          <h3>Acceso rápido a partidos</h3>
-          <div class="prediction-quick-actions">
-            <button type="button" onclick="setPredictionDayFilter('today')">Hoy</button>
-            <button type="button" onclick="setPredictionDayFilter('tomorrow')">Mañana</button>
-            <button type="button" onclick="setPredictionDayFilter('next')">Próxima fecha</button>
-            <button type="button" onclick="setPredictionDayFilter('all')">Ver todos</button>
-            <select id="dayFilter" onchange="renderPredictions()">
-              <option value="all">Todos los días</option>
-            </select>
-            <span id="visiblePredictionsCount" class="prediction-count-pill">0 partidos visibles</span>
-          </div>
-        </div>
-
-
         <div class="filters">
           <select id="stageFilter" onchange="renderPredictions()">
             <option value="all">Todos los partidos</option>
@@ -2289,13 +2377,31 @@
 
         <div id="adminPanel" class="hidden">
           <div id="adminTools" class="admin-tools"></div>
+
+          <div class="card" style="margin-bottom:16px; padding:16px; background:#fffdf1;">
+            <div class="section-title" style="margin-bottom:12px;">
+              <div>
+                <h3 style="font-size:18px;">Acceso rápido a partidos</h3>
+                <p class="muted">Filtra los encuentros que necesitas actualizar sin recorrer todo el listado.</p>
+              </div>
+              <span id="adminMatchesCount" class="badge">0 partidos</span>
+            </div>
+            <div class="actions" style="margin-top:0;">
+              <button class="btn-dark" type="button" onclick="setAdminQuickDate('today')">Hoy</button>
+              <button class="btn-secondary" type="button" onclick="setAdminQuickDate('tomorrow')">Mañana</button>
+              <button class="btn-secondary" type="button" onclick="setAdminQuickDate('next')">Próxima fecha</button>
+              <button class="btn-secondary" type="button" onclick="setAdminQuickDate('all')">Ver todos</button>
+            </div>
+          </div>
+
           <div class="filters">
             <select id="adminStageFilter" onchange="renderAdminMatches()">
               <option value="all">Todos los partidos</option>
               <option value="group">Solo grupos</option>
               <option value="knockout">Solo eliminatorias</option>
             </select>
-            <input id="adminSearch" type="text" placeholder="Buscar partido..." oninput="renderAdminMatches()" />
+            <input id="adminDateFilter" type="date" onchange="renderAdminMatches()" aria-label="Filtrar por fecha" />
+            <input id="adminSearch" type="text" placeholder="Buscar partido, selección o sede..." oninput="renderAdminMatches()" />
           </div>
           <div id="adminMatches" class="grid"></div>
         </div>
@@ -2304,7 +2410,7 @@
   </main>
 
   <script>
-    const APP_VERSION = "bf-world-cup-2026-v39-prediction-quick-navigation";
+    const APP_VERSION = "bf-world-cup-2026-v40-admin-date-filters";
     const STORAGE_KEY = "quiniela_mundial_2026_bf_v38_supabase_cache";
     const ADMIN_PIN = "2026";
 
@@ -5444,7 +5550,7 @@
           (stageFilter === "knockout" && match.type === "knockout") ||
           match.stage === stageFilter;
 
-        const visibilityOk = match.type !== "knockout" || isKnockoutVisible(match);
+        const visibilityOk = true; // Mostrar siempre todos los cruces de eliminatorias en Predicciones
         return visibilityOk && filterOk && (!search || text.includes(search));
       }).sort((a,b) => new Date(a.matchDate) - new Date(b.matchDate));
     }
@@ -6650,26 +6756,72 @@
       renderAdminMatches();
     }
 
+    function getLocalDateKey(value) {
+      if (!value) return "";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "";
+      const offsetDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+      return offsetDate.toISOString().slice(0, 10);
+    }
+
+    function setAdminQuickDate(mode) {
+      const dateInput = document.getElementById("adminDateFilter");
+      if (!dateInput) return;
+
+      if (mode === "all") {
+        dateInput.value = "";
+        renderAdminMatches();
+        return;
+      }
+
+      const now = new Date();
+      if (mode === "today") {
+        dateInput.value = getLocalDateKey(now);
+      } else if (mode === "tomorrow") {
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        dateInput.value = getLocalDateKey(tomorrow);
+      } else if (mode === "next") {
+        const todayKey = getLocalDateKey(now);
+        const nextMatch = [...state.matches]
+          .filter(match => getLocalDateKey(match.matchDate) >= todayKey)
+          .sort((a, b) => new Date(a.matchDate) - new Date(b.matchDate))[0];
+        dateInput.value = nextMatch ? getLocalDateKey(nextMatch.matchDate) : "";
+      }
+
+      renderAdminMatches();
+    }
+
     function renderAdminMatches() {
       if (!isCurrentUserAdmin()) return;
 
       const filterEl = document.getElementById("adminStageFilter");
+      const dateEl = document.getElementById("adminDateFilter");
       const searchEl = document.getElementById("adminSearch");
       const filter = filterEl ? filterEl.value : "all";
+      const dateFilter = dateEl ? dateEl.value : "";
       const search = searchEl ? searchEl.value.trim().toLowerCase() : "";
 
       const matches = state.matches.filter((match) => {
         const homeId = getResolvedTeamId(match, "home");
         const awayId = getResolvedTeamId(match, "away");
-        const text = `${match.stage} ${teamName(homeId)} ${teamName(awayId)} ${match.venue} ${match.matchNo}`.toLowerCase();
+        const text = `${match.stage} ${teamName(homeId)} ${teamName(awayId)} ${match.venue} ${match.matchNo} ${formatDate(match.matchDate)}`.toLowerCase();
         const filterOk =
           filter === "all" ||
           (filter === "group" && match.type === "group") ||
           (filter === "knockout" && match.type === "knockout");
-        return filterOk && (!search || text.includes(search));
+        const dateOk = !dateFilter || getLocalDateKey(match.matchDate) === dateFilter;
+        return filterOk && dateOk && (!search || text.includes(search));
       });
 
+      const count = document.getElementById("adminMatchesCount");
+      if (count) count.textContent = `${matches.length} ${matches.length === 1 ? "partido" : "partidos"}`;
+
       const container = document.getElementById("adminMatches");
+      if (!matches.length) {
+        container.innerHTML = '<div class="alert">No hay partidos para los filtros seleccionados.</div>';
+        return;
+      }
       container.innerHTML = matches.map((match) => {
         const homeId = getResolvedTeamId(match, "home");
         const awayId = getResolvedTeamId(match, "away");
