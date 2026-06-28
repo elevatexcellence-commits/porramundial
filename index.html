@@ -2500,6 +2500,87 @@
     #bracketView .fifa-final-card > .fifa-match { position:relative !important; left:auto !important; top:auto !important; width:100% !important; min-height:58px !important; border:0 !important; border-radius:8px; box-shadow:none; }
     #bracketView .fifa-third .fifa-match { position:relative !important; left:auto !important; top:auto !important; width:76px !important; min-height:47px !important; }
 
+  
+
+    /* v50 · bracket compacto, centrado y limpio */
+    #bracketView .bracket-poster.v5{
+      overflow-x:hidden !important;
+      overflow-y:visible !important;
+      padding: 12px 8px 18px !important;
+    }
+    #bracketView .fifa-bracket-board{
+      width:1360px !important;
+      max-width:none !important;
+      margin:0 auto !important;
+      position:relative;
+      transform:scale(.74);
+      transform-origin: top center;
+      height:760px;
+      margin-bottom:-190px !important;
+    }
+    #bracketView .fifa-stage-label{ display:none !important; }
+    #bracketView .fifa-title{
+      top:38px !important;
+      left:50% !important;
+      transform:translateX(-50%);
+      width:260px !important;
+      text-align:center;
+    }
+    #bracketView .fifa-title h2{
+      font-size:44px !important;
+      line-height:.9 !important;
+      margin:0 !important;
+    }
+    #bracketView .fifa-title p{ display:none !important; }
+    #bracketView .fifa-final-zone{ top:150px !important; width:250px !important; left:50% !important; transform:translateX(-50%); }
+    #bracketView .fifa-final-card{ min-height:72px !important; }
+    #bracketView .fifa-final-caption{ margin-top:6px !important; }
+    #bracketView .fifa-third{ top:355px !important; width:250px !important; left:50% !important; transform:translateX(-50%); }
+    #bracketView .fifa-third h4{ margin-bottom:8px !important; }
+    #bracketView .fifa-trophy{
+      width:78px !important;
+      height:112px !important;
+      bottom:42px !important;
+      left:50% !important;
+      transform:translateX(-50%) !important;
+    }
+    #bracketView .poster-trophy-wrap,
+    #bracketView .fifa-trophy .poster-trophy-wrap{
+      width:78px !important;
+      height:112px !important;
+    }
+    #bracketView .fifa-match{
+      width:72px !important;
+      min-height:46px !important;
+      padding:4px 5px !important;
+      border-radius:8px !important;
+    }
+    #bracketView .fifa-match.is-first{ width:82px !important; }
+    #bracketView .fifa-team-row{ gap:4px !important; }
+    #bracketView .fifa-flag{ width:16px !important; height:12px !important; border-radius:2px !important; }
+    #bracketView .fifa-score{ font-size:11px !important; }
+    #bracketView .fifa-meta{ font-size:8px !important; margin-top:3px !important; }
+    #bracketView .poster-groups{ margin-top:0 !important; }
+    @media (max-width:1200px){
+      #bracketView .fifa-bracket-board{ transform:scale(.68); margin-bottom:-240px !important; }
+    }
+    @media (max-width:900px){
+      #bracketView .bracket-poster.v5{ overflow-x:auto !important; }
+      #bracketView .fifa-bracket-board{
+        transform:none !important;
+        width:1180px !important;
+        height:700px !important;
+        margin-bottom:0 !important;
+      }
+      #bracketView .fifa-svg{ width:1180px !important; height:700px !important; }
+      #bracketView .fifa-title{ top:34px !important; width:220px !important; }
+      #bracketView .fifa-title h2{ font-size:38px !important; }
+      #bracketView .fifa-final-zone{ top:140px !important; }
+      #bracketView .fifa-third{ top:330px !important; }
+      #bracketView .fifa-trophy{ bottom:36px !important; width:72px !important; height:100px !important; }
+      #bracketView .fifa-trophy .poster-trophy-wrap{ width:72px !important; height:100px !important; }
+    }
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -6847,7 +6928,7 @@
         return `<div class="fifa-match ${cls}">
           <div class="fifa-team-row">${flag(homeId)}<span class="fifa-score">${match.finished ? match.homeScore : ""}</span></div>
           <div class="fifa-team-row">${flag(awayId)}<span class="fifa-score">${match.finished ? match.awayScore : ""}</span></div>
-          <div class="fifa-meta">${match.finished && match.winnerTeamId ? "Clasificado" : `P${match.matchNo}`}</div>
+          <div class="fifa-meta">`P${match.matchNo}`</div>
         </div>`;
       };
 
@@ -6903,14 +6984,6 @@
         <div class="bracket-poster v5">
           <div class="fifa-bracket-board">
             ${connectorSvg}
-            <div class="fifa-stage-label left" style="left:35px;top:57px">1/16</div>
-            <div class="fifa-stage-label left" style="left:177px;top:57px">1/8</div>
-            <div class="fifa-stage-label left" style="left:318px;top:57px">Cuartos</div>
-            <div class="fifa-stage-label left" style="left:453px;top:57px">Semis</div>
-            <div class="fifa-stage-label right" style="right:453px;top:57px">Semis</div>
-            <div class="fifa-stage-label right" style="right:318px;top:57px">Cuartos</div>
-            <div class="fifa-stage-label right" style="right:177px;top:57px">1/8</div>
-            <div class="fifa-stage-label right" style="right:35px;top:57px">1/16</div>
             <div class="fifa-title"><h2>WORLD CUP<br/>2026</h2><p>Canadá · México · USA</p></div>
             ${leftCards}${rightCards}
             <div class="fifa-final-zone"><h3>Final</h3><div class="fifa-final-card">${finalMatch ? card(finalMatch).replace('class="fifa-match', 'class="fifa-match').replace('style="', 'style="') : ''}</div><p class="fifa-final-caption">Campeón</p></div>
