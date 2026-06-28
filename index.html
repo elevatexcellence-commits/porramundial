@@ -2614,6 +2614,26 @@
 
         <div id="bonusPredictionBox"></div>
 
+        <div class="prediction-quick-toolbar" aria-label="Acceso rápido a partidos">
+          <div>
+            <h3>Acceso rápido a partidos</h3>
+            <p class="muted">Salta directamente a los encuentros que se juegan hoy, mañana o en la próxima fecha.</p>
+          </div>
+          <div class="actions" style="margin-top:0;">
+            <button class="btn-dark" type="button" onclick="setPredictionDayFilter('today')">Hoy</button>
+            <button class="btn-secondary" type="button" onclick="setPredictionDayFilter('tomorrow')">Mañana</button>
+            <button class="btn-secondary" type="button" onclick="setPredictionDayFilter('next')">Próxima fecha</button>
+            <button class="btn-secondary" type="button" onclick="setPredictionDayFilter('all')">Ver todos</button>
+          </div>
+          <div class="prediction-quick-select">
+            <label for="dayFilter">Ir a una fecha</label>
+            <select id="dayFilter" onchange="renderPredictions()">
+              <option value="all">Todos los días</option>
+            </select>
+          </div>
+          <div id="visiblePredictionsCount" class="prediction-visible-count">Cargando partidos...</div>
+        </div>
+
         <div class="filters">
           <select id="stageFilter" onchange="renderPredictions()">
             <option value="all">Todos los partidos</option>
