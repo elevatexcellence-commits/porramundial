@@ -3411,6 +3411,15 @@
     .rank-movement.same { color:#64748b; background:#f1f5f9; border:1px solid #cbd5e1; min-width:22px; }
     .rank-card .rank-movement { margin-left:6px; transform:translateY(-1px); }
 
+  
+
+    /* v55 · movimiento de ranking visible en columna propia */
+    .ranking-movement-head { width: 92px; text-align:center; }
+    .ranking-movement-cell { width:92px; text-align:center; }
+    .ranking-movement-cell .rank-movement { margin:0 auto; }
+    .ranking-reference-note { margin: 0 0 12px; font-size: 12px; color: #64748b; }
+    .rank-movement.pending { color:#64748b; background:#f1f5f9; border:1px solid #cbd5e1; min-width:86px; font-size:10px; }
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -7353,6 +7362,9 @@
       if (movement.direction === "down") {
         return `<span class="rank-movement down" title="Baja ${movement.value} posiciones desde la jornada anterior"><span class="rank-arrow">↓</span><b>${movement.value}</b></span>`;
       }
+      if (!movement.previousPosition) {
+        return `<span class="rank-movement pending" title="Aún no había una referencia guardada">Sin ref.</span>`;
+      }
       return `<span class="rank-movement same" title="Sin cambios respecto a la jornada anterior">—</span>`;
     }
 
@@ -7371,8 +7383,22 @@
       };
     }
 
+    function ensureRankingBaseline(leaderboard) {
+      if (state.awards?.rankingSnapshot?.positions) return;
+      if (!state.awards) state.awards = { championTeamId: null, goldenBootPlayer: "", bonusLocked: false, rankingSnapshot: null };
+      const positions = {};
+      leaderboard.forEach((user, index) => { positions[user.id] = index + 1; });
+      state.awards.rankingSnapshot = {
+        journeyDate: "baseline",
+        positions,
+        capturedAt: new Date().toISOString()
+      };
+      saveState();
+    }
+
     function renderLeaderboard() {
       const leaderboard = getLeaderboard();
+      ensureRankingBaseline(leaderboard);
       const table = document.getElementById("leaderboardTable");
 
       if (leaderboard.length === 0) {
@@ -7396,11 +7422,13 @@
           `).join("")}
         </div>
 
+        <p class="ranking-reference-note">Variación frente al ranking guardado antes de la última jornada con resultados.</p>
         <div class="leader-rest">
           <table>
             <thead>
               <tr>
                 <th>Posición</th>
+                <th class="ranking-movement-head">Variación</th>
                 <th>Empleado</th>
                 <th>Campeón previsto</th>
                 <th>Predicciones</th>
@@ -7411,7 +7439,8 @@
             <tbody>
               ${leaderboard.map((user, index) => `
                 <tr>
-                  <td><span class="rank-position-cell">#${index + 1}${renderRankingMovement(user.id, index + 1)}</span></td>
+                  <td><span class="rank-position-cell">#${index + 1}</span></td>
+                  <td class="ranking-movement-cell">${renderRankingMovement(user.id, index + 1)}</td>
                   <td><button class="leader-name-button" onclick="showUserPredictions('${user.id}')">${escapeHtml(user.name)}</button></td>
                   <td>${renderPredictedChampion(user)}</td>
                   <td>${user.predictions}</td>
