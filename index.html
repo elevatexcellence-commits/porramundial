@@ -3400,6 +3400,17 @@
       display: none !important;
     }
 
+  
+
+    /* v54 · variación de posiciones en ranking */
+    .rank-position-cell { display:inline-flex; align-items:center; gap:8px; }
+    .rank-movement { display:inline-flex; align-items:center; justify-content:center; gap:2px; min-width:30px; height:22px; padding:0 6px; border-radius:999px; font-size:12px; font-weight:900; line-height:1; vertical-align:middle; }
+    .rank-movement .rank-arrow { font-size:16px; line-height:1; margin-top:-1px; }
+    .rank-movement.up { color:#047857; background:#d1fae5; border:1px solid #6ee7b7; }
+    .rank-movement.down { color:#b91c1c; background:#fee2e2; border:1px solid #fca5a5; }
+    .rank-movement.same { color:#64748b; background:#f1f5f9; border:1px solid #cbd5e1; min-width:22px; }
+    .rank-card .rank-movement { margin-left:6px; transform:translateY(-1px); }
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -6213,7 +6224,7 @@
         matches: structuredClone(INITIAL_MATCHES),
         predictions: [],
         bonusPredictions: [],
-        awards: { championTeamId: null, goldenBootPlayer: "", bonusLocked: false },
+        awards: { championTeamId: null, goldenBootPlayer: "", bonusLocked: false, rankingSnapshot: null },
         live: { lastSync: null, lastMessage: "Supabase pendiente de sincronizar" }
       });
     }
@@ -6224,7 +6235,7 @@
       data.matches ||= structuredClone(INITIAL_MATCHES);
       data.predictions ||= [];
       data.bonusPredictions ||= [];
-      data.awards ||= { championTeamId: null, goldenBootPlayer: "", bonusLocked: false };
+      data.awards ||= { championTeamId: null, goldenBootPlayer: "", bonusLocked: false, rankingSnapshot: null };
       data.awards.bonusLocked = Boolean(data.awards.bonusLocked);
       data.live ||= { lastSync: null, lastMessage: "Supabase" };
       data.matches.forEach((match) => { match.status ||= match.finished ? "finished" : "scheduled"; });
@@ -6383,7 +6394,8 @@
           awards: {
             championTeamId: awardsResult.data?.champion_team_id || null,
             goldenBootPlayer: awardsResult.data?.golden_boot_player || "",
-            bonusLocked: Boolean(awardsResult.data?.bonus_locked)
+            bonusLocked: Boolean(awardsResult.data?.bonus_locked),
+            rankingSnapshot: awardsResult.data?.ranking_snapshot || null
           },
           live: { lastSync: new Date().toISOString(), lastMessage: "Conectado a Supabase" }
         });
@@ -6453,6 +6465,7 @@
               champion_team_id: state.awards?.championTeamId || null,
               golden_boot_player: state.awards?.goldenBootPlayer || null,
               bonus_locked: Boolean(state.awards?.bonusLocked),
+              ranking_snapshot: state.awards?.rankingSnapshot || null,
               updated_at: new Date().toISOString()
             }, { onConflict: "id" });
           if (awardsError) console.warn("No se pudieron sincronizar awards", awardsError);
@@ -7321,6 +7334,43 @@
       return `<span>${renderMiniFlagImg(user.predictedChampionTeamId, teamFlag(user.predictedChampionTeamId), `Campeón previsto ${teamName(user.predictedChampionTeamId)}`)} Campeón: ${teamName(user.predictedChampionTeamId)}</span>`;
     }
 
+    function getRankingMovement(userId, currentPosition) {
+      const snapshot = state.awards?.rankingSnapshot;
+      const previousPosition = Number(snapshot?.positions?.[userId]);
+      if (!previousPosition || !currentPosition || previousPosition === currentPosition) {
+        return { direction: "same", value: 0, previousPosition: previousPosition || null };
+      }
+      return previousPosition > currentPosition
+        ? { direction: "up", value: previousPosition - currentPosition, previousPosition }
+        : { direction: "down", value: currentPosition - previousPosition, previousPosition };
+    }
+
+    function renderRankingMovement(userId, currentPosition) {
+      const movement = getRankingMovement(userId, currentPosition);
+      if (movement.direction === "up") {
+        return `<span class="rank-movement up" title="Sube ${movement.value} posiciones desde la jornada anterior"><span class="rank-arrow">↑</span><b>${movement.value}</b></span>`;
+      }
+      if (movement.direction === "down") {
+        return `<span class="rank-movement down" title="Baja ${movement.value} posiciones desde la jornada anterior"><span class="rank-arrow">↓</span><b>${movement.value}</b></span>`;
+      }
+      return `<span class="rank-movement same" title="Sin cambios respecto a la jornada anterior">—</span>`;
+    }
+
+    function captureRankingSnapshotForJourney(match) {
+      const journeyDate = getLocalDayKey(match.matchDate) || String(match.matchDate || "").slice(0, 10);
+      if (!journeyDate) return;
+      if (!state.awards) state.awards = { championTeamId: null, goldenBootPlayer: "", bonusLocked: false, rankingSnapshot: null };
+      const currentSnapshot = state.awards.rankingSnapshot;
+      if (currentSnapshot?.journeyDate === journeyDate) return;
+      const positions = {};
+      getLeaderboard().forEach((user, index) => { positions[user.id] = index + 1; });
+      state.awards.rankingSnapshot = {
+        journeyDate,
+        positions,
+        capturedAt: new Date().toISOString()
+      };
+    }
+
     function renderLeaderboard() {
       const leaderboard = getLeaderboard();
       const table = document.getElementById("leaderboardTable");
@@ -7337,7 +7387,7 @@
         <div class="podium-grid">
           ${topThree.map((user, index) => `
             <article class="rank-card rank-${index + 1}">
-              <div class="rank-number">#${index + 1} ${rankIcon(index)}</div>
+              <div class="rank-number">#${index + 1} ${renderRankingMovement(user.id, index + 1)} ${rankIcon(index)}</div>
               <div class="rank-name"><button class="rank-name-button" onclick="showUserPredictions('${user.id}')">${escapeHtml(user.name)}</button></div>
               <div class="rank-meta">${renderPredictedChampion(user)}</div>
               <div class="rank-points">${user.points} pts</div>
@@ -7361,7 +7411,7 @@
             <tbody>
               ${leaderboard.map((user, index) => `
                 <tr>
-                  <td>#${index + 1}</td>
+                  <td><span class="rank-position-cell">#${index + 1}${renderRankingMovement(user.id, index + 1)}</span></td>
                   <td><button class="leader-name-button" onclick="showUserPredictions('${user.id}')">${escapeHtml(user.name)}</button></td>
                   <td>${renderPredictedChampion(user)}</td>
                   <td>${user.predictions}</td>
@@ -8179,6 +8229,7 @@
         return;
       }
 
+      captureRankingSnapshotForJourney(match);
       match.homeScore = homeScore;
       match.awayScore = awayScore;
       match.finished = true;
