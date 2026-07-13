@@ -3452,7 +3452,7 @@
 
       <div id="loginMessage"></div>
 
-      <div class="grid-2">
+      <div id="authGrid" class="grid-2">
         <div class="auth-panel">
           <h3>Entrar</h3>
           <label for="loginEmail">Correo corporativo</label>
@@ -3463,7 +3463,9 @@
 
           <div class="actions">
             <button class="btn-primary" onclick="loginWithPassword()">Entrar</button>
+            <button class="btn-secondary" type="button" onclick="sendPasswordRecovery()">Recuperar contraseña</button>
           </div>
+          <p class="muted" style="margin-top:8px;">Escribe tu correo arriba y pulsa recuperar contraseña. Te llegará un enlace para crear una nueva.</p>
         </div>
 
         <div class="auth-panel">
@@ -3485,6 +3487,18 @@
           </div>
         </div>
 
+      </div>
+
+      <div id="passwordResetPanel" class="auth-panel hidden" style="max-width:520px;margin:20px auto 0;">
+        <h3>Crear nueva contraseña</h3>
+        <p class="muted">Introduce tu nueva contraseña. Debe tener al menos 6 caracteres.</p>
+        <label for="newPassword">Nueva contraseña</label>
+        <input id="newPassword" type="password" placeholder="Nueva contraseña" autocomplete="new-password" />
+        <label for="newPasswordConfirm" style="margin-top:12px;">Confirmar nueva contraseña</label>
+        <input id="newPasswordConfirm" type="password" placeholder="Repite la nueva contraseña" autocomplete="new-password" />
+        <div class="actions">
+          <button class="btn-primary" type="button" onclick="updateRecoveredPassword()">Guardar nueva contraseña</button>
+        </div>
       </div>
 
     </section>
@@ -6495,6 +6509,88 @@
       box.innerHTML = `<div class="alert ${type}">${message}</div>`;
     }
 
+    function getPasswordRecoveryRedirectUrl() {
+      return `${window.location.origin}${window.location.pathname}?reset-password=1`;
+    }
+
+    async function sendPasswordRecovery() {
+      const email = document.getElementById("loginEmail")?.value.trim().toLowerCase() || "";
+
+      if (!email) {
+        showAuthMessage("Escribe tu correo corporativo en el campo de entrada y pulsa recuperar contraseña.", "error");
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        showAuthMessage("Introduce un correo corporativo válido.", "error");
+        return;
+      }
+
+      showAuthMessage("Enviando email de recuperación...", "");
+
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: getPasswordRecoveryRedirectUrl()
+      });
+
+      if (error) {
+        showAuthMessage(`No se pudo enviar el email de recuperación: ${error.message}`, "error");
+        return;
+      }
+
+      showAuthMessage("Te hemos enviado un email para recuperar la contraseña. Revisa también spam o promociones.", "success");
+    }
+
+    function isPasswordRecoveryFlow() {
+      const query = new URLSearchParams(window.location.search);
+      const hash = new URLSearchParams((window.location.hash || "").replace(/^#/, ""));
+      return query.get("reset-password") === "1" || hash.get("type") === "recovery";
+    }
+
+    function showPasswordResetPanel() {
+      document.getElementById("loginSection")?.classList.remove("hidden");
+      document.getElementById("appSection")?.classList.add("hidden");
+      document.getElementById("authGrid")?.classList.add("hidden");
+      document.getElementById("passwordResetPanel")?.classList.remove("hidden");
+      showAuthMessage("Introduce una nueva contraseña para completar la recuperación.", "success");
+    }
+
+    async function updateRecoveredPassword() {
+      const password = document.getElementById("newPassword")?.value || "";
+      const confirmPassword = document.getElementById("newPasswordConfirm")?.value || "";
+
+      if (!password || !confirmPassword) {
+        showAuthMessage("Introduce y confirma la nueva contraseña.", "error");
+        return;
+      }
+
+      if (password.length < 6) {
+        showAuthMessage("La contraseña debe tener al menos 6 caracteres.", "error");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showAuthMessage("Las contraseñas no coinciden.", "error");
+        return;
+      }
+
+      showAuthMessage("Actualizando contraseña...", "");
+
+      const { error } = await supabaseClient.auth.updateUser({ password });
+
+      if (error) {
+        showAuthMessage(`No se pudo actualizar la contraseña: ${error.message}`, "error");
+        return;
+      }
+
+      await supabaseClient.auth.signOut();
+      currentUser = null;
+      sessionStorage.removeItem("quiniela_current_user_bf_v6_auth");
+      document.getElementById("passwordResetPanel")?.classList.add("hidden");
+      document.getElementById("authGrid")?.classList.remove("hidden");
+      window.history.replaceState({}, document.title, window.location.pathname);
+      showAuthMessage("Contraseña actualizada correctamente. Ya puedes iniciar sesión con la nueva contraseña.", "success");
+    }
+
     function isValidEmail(email) {
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
@@ -8463,8 +8559,20 @@
     window.addEventListener("load", async () => {
       startKickoffCountdown();
 
+      const recoveryFlow = isPasswordRecoveryFlow();
       const { data } = await supabaseClient.auth.getSession();
       const session = data?.session;
+
+      if (recoveryFlow) {
+        if (session?.user) {
+          showPasswordResetPanel();
+        } else {
+          showAuthMessage("El enlace de recuperación no es válido o ha caducado. Solicita uno nuevo desde Recuperar contraseña.", "error");
+        }
+        await loadStateFromSupabase();
+        refreshLiveStatus();
+        return;
+      }
 
       if (session?.user) {
         await loadStateFromSupabase();
